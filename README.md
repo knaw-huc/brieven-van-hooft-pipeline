@@ -23,7 +23,10 @@ FoLiA and making it available as W3C Web Annotations.
 
 ## Data
 
-*(Describe the current state of the data and its licensing)*
+* The data consists of 333 FoLiA XML documents (75MB), though there have been some
+  manual extensions by the authors which are not valid FoLiA and which need to be
+  integrated properly.
+* Licensing has to be cleared up still.
 
 ## Use case
 
@@ -44,6 +47,7 @@ Some of the above may need some extension and tweaking in the scope of this proj
 
 * **Software:** A conversion pipeline to take the current form of Brieven van Hooft (FoLiA XML?) and transform it*
  in such a way that it can be shown in TextAnnoViz. This git repository will primarily hold this implementation, its input and output.
+    * The pipeline includes some preprocessors to fix the FoLiA input, as the data authors added some extensions that renders the FoLiA invalid. (*Time estimate:* 8 hours)
     * **Software:** `stam2webanno` - STAM to W3C Web Annotation export. This STAM extension is already [formulated here](https://github.com/annotation/stam/tree/master/extensions/stam-webannotations) but is not implemented yet.
         * *Time estimate:* 40 hours
 * **Service:** TextAnnoViz service for Brieven van Hooft
