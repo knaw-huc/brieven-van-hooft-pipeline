@@ -8,7 +8,7 @@ The aim of this project is to make the *Brieven van [P.C.
 Hooft](https://nl.wikipedia.org/wiki/Pieter_Corneliszoon_Hooft)* better 
 accessible to researchers. 
 
-These have been linguistically enriched with part-of-speech tags and lemmas in an earlier project *(which? how?)* and
+These have been linguistically enriched with part-of-speech tags and lemmas in an earlier project and
 delivered in [FoLiA XML](https://proycon.github.io/folia) format. We intend to
 produce W3C Web Annotations via [STAM](https://annotation.github.io), so the
 texts and any annotations can ultimately be showed and queried via
@@ -32,7 +32,8 @@ FoLiA and making it available as W3C Web Annotations.
     * <https://www.dbnl.org/tekst/hoof001hwva03_01/>
     * <https://www.dbnl.org/tekst/hoof001hwva04_01/>
 * License information for the works: <https://www.dbnl.org/titels/gebruiksvoorwaarden.php?id=hoof001hwva03>
-* The lines in the plaintext, PDF and TEI, are numbered.
+* The lines (corresponding with the originals in the scan I presume) in the plaintext, PDF and TEI, are numbered .
+* The TEI does not contain hard/persistent identifiers
 * Some data that is present in the original version is no longer present in the FoLiA, it was probably stripped in some preprocesing:
     * Line information is not present in the FoLiA versions.
     * Page numbers are not present in the FoLiA version
@@ -40,10 +41,25 @@ FoLiA and making it available as W3C Web Annotations.
 * Lines may be tied together using hyphenation, no dehyphenation was performed prior to processing by Frog so this leads to incorrect tokens, sentence boundaries, paragraph boundaries and incorrect PoS/lemma tags. The authors have tried to remedy this in their manual annotation stage using custom alignment tags.
 * There is no data that ties the text documents to the original scans.
 
+### Questions
+
+*Q: What form of the data do we consider the source of the data that we want to make references to?*
+
+[proycon] Though the original source is of course the physical letters (and
+derived from that are the scans), we don't have that data, nor an alignment to
+it. The work as published by H.W. van Tricht, and as digitized in the DBNL,
+should I think be considered the source. Derived from that is the
+linguistically enriched FoLiA version, for which an explicit alignment with the
+DBNL version is not available. If the DBNL plain text version is persistent
+enough it might be worth considering that as the source and attempting to
+realign the annotations in the FoLiA with that, but this will take significant
+extra effort.
+
+*Q: I assume we are mainly interested in the manual annotations?*
+
 ## Use case
 
 *(Describe the wishes and requirements from the researcher's perspective)*
-
 
 ## Requirements
 
@@ -65,5 +81,4 @@ Some of the above may need some extension and tweaking in the scope of this proj
 * **Service:** TextAnnoViz service for Brieven van Hooft
 * **Data:** STAM model for Brieven van Hooft. This can be queried and visualised using low-level tools.
 * **Data (optional):** Some static HTML visualisations provided via the STAM tooling, not reliant on any further infrastructure.
-
 
