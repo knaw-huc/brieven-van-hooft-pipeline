@@ -1,7 +1,5 @@
 # Brieven van Hooft pipeline
 
-*(this is a very preliminary text missing details)*
-
 ## Introduction
 
 The aim of this project is to make the *Brieven van [P.C.
