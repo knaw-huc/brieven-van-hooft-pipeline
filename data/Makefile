@@ -1,15 +1,18 @@
-.PHONY: clean list all validation
+.SHELLFLAGS = -o pipefail -c
+.PHONY: clean list all validation stam
 
 folia_merged := $(wildcard *.merged.xml)
 folia_fixed := $(folia_merged:%.merged.xml=%.fixed.xml)
 folia_validation := $(folia_merged:%.merged.xml=%.validation)
 
-all: $(folia_fixed) $(folia_validation) 
+all: $(folia_fixed) $(folia_validation) stam
 
 clean:
 	-rm alignments.lst
-	-rm *.fixed.xml
-	-rm *.validation
+	-rm hoof*.fixed.xml
+	-rm hoof*.validation
+	-rm hoof*.stam.json
+	-rm hoof*.txt
 
 list: $(folia_merged)
 	@ls $(folia_merged)
@@ -25,3 +28,7 @@ validation: $(folia_validation)
 	if ! ../scripts/fixfolia.py "$<" > "$@" 2> err; then cat err; false; fi
 	cat err >> alignments.lst
 
+stam: hoof001hwva.store.stam.json
+
+hoof001hwva.store.stam.json: $(folia_fixed)
+	folia2stam --id hoof01hwva -X $(folia_fixed)
