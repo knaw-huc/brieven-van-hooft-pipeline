@@ -30,8 +30,12 @@ with open(filename,'r', encoding='utf-8') as f:
             if line.find(skip_until) != -1:
                 skip_until = None
             continue
+        line = line.replace("untitled",filename)
         if line.find("<w ") != -1:
             word_id = re.findall(re_id, line)[0]
+        elif line.find("<feat ") != -1:
+            #fix empty subsets
+            line = line.replace('class="+formnt" subset=""','class="+formnt" subset="buiging"').replace('class="+herhalen" subset=""','class="+herhalen" subset="herhalen"').replace('class="+alse" subset=""','class="+alse" subset="alse"')
         elif line.find("<alt") != -1 and (line.find("src=\"gustave\"") != -1 or line.find("src=\"gustave-merge\"") != -1):
             alt = True
             split_pos = []
