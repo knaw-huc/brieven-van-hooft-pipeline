@@ -12,10 +12,12 @@ clean: cleanstam
 	-rm alignments.lst
 	-rm hoof*.fixed.xml
 	-rm hoof*.validation
+	-rm hoof*.folia.html
 
 cleanstam:
 	-rm hoof*.stam.json
 	-rm hoof*.txt
+	-rm hoof*.stam.html
 
 list: $(folia_merged)
 	@ls $^
@@ -45,3 +47,7 @@ folia.html: $(folia_html)
 
 hoof001hwva.store.stam.json: $(folia_fixed)
 	folia2stam --id hoof001hwva -X $^
+
+hoof001hwva.jsonl: hoof001hwva.store.stam.json
+	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft/dataset" --annotation-prefix "urn:brievenvanhooft/annotation" --resource-prefix "urn:brievenvanhooft/resource" --use "pos" --query 'SELECT ANNOTATION ?pos WHERE DATA "gustave-pos" "class";' hoof001hwva.store.stam.json > $@
+	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft/dataset" --annotation-prefix "urn:brievenvanhooft/annotation" --resource-prefix "urn:brievenvanhooft/resource" --use "lem" --query 'SELECT ANNOTATION ?lem WHERE DATA "gustave-lem" "class";' hoof001hwva.store.stam.json >> $@
