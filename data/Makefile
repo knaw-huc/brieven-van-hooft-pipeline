@@ -49,5 +49,5 @@ hoof001hwva.store.stam.json: $(folia_fixed)
 	folia2stam --id hoof001hwva -X $^
 
 hoof001hwva.jsonl: hoof001hwva.store.stam.json
-	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft/dataset" --annotation-prefix "urn:brievenvanhooft/annotation" --resource-prefix "urn:brievenvanhooft/resource" --use "pos" --query 'SELECT ANNOTATION ?pos WHERE DATA "gustave-pos" "class";' hoof001hwva.store.stam.json > $@
-	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft/dataset" --annotation-prefix "urn:brievenvanhooft/annotation" --resource-prefix "urn:brievenvanhooft/resource" --use "lem" --query 'SELECT ANNOTATION ?lem WHERE DATA "gustave-lem" "class";' hoof001hwva.store.stam.json >> $@
+	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "urn:brievenvanhooft:resource" --use "pos" --query 'SELECT ANNOTATION ?pos WHERE DATA "gustave-pos" "class";' hoof001hwva.store.stam.json > $@
+	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "urn:brievenvanhooft:resource" --use "lem" --query 'SELECT ANNOTATION ?lem WHERE DATA "gustave-lem" "class";' hoof001hwva.store.stam.json >> $@
