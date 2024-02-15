@@ -74,7 +74,7 @@ Some of the above may need some extension and tweaking in the scope of this proj
 
 * **Software:** A conversion pipeline to take the current form of Brieven van Hooft and transform it in such a way that it can be shown in TextAnnoViz. This git repository will primarily hold this implementation, its input and output.
     * The pipeline includes some preprocessors to fix the FoLiA input, as the data authors added some extensions that renders the FoLiA invalid. (*Time estimate:* 8 hours)
-    * **Software:** `stam2webanno` - STAM to W3C Web Annotation export. This STAM extension is already [formulated here](https://github.com/annotation/stam/tree/master/extensions/stam-webannotations) but is not implemented yet.
+    * **Software:** STAM to W3C Web Annotation export. This STAM extension is already [formulated here](https://github.com/annotation/stam/tree/master/extensions/stam-webannotations) but is not implemented yet.
         * *Time estimate:* 40 hours
 * **Service:** TextAnnoViz service for Brieven van Hooft, allowing to interactively search and view the letters and annotations online.
 * **Data:** STAM model for Brieven van Hooft. This can be queried and visualised using low-level local tools.
@@ -85,22 +85,22 @@ Some of the above may need some extension and tweaking in the scope of this proj
 
 ```mermaid
 flowchart TD
-    folia_input[["FoLiA XML input (with custom extensions)"]]
+    folia_input[["FoLiA XML input\n(with custom extensions)"]]
     folia_fixed[[Sanitized FoLiA XML]]
     fixfolia{{scripts/fixfolia.py}}
     folia2stam{{folia2stam}}
     stamstore[Stand-off Text Annotation Model]
-    stamview{{"STAM to HTML (stam view)"}}
+    stamview{{"STAM to HTML\n(stam view)"}}
     stamhtml[["Static HTML visualisations from STAM"]]
     folia2html{{folia2html}}
     foliahtml[["Static HTML visualisations from FoLiA"]]
-    stam2webanno{{"STAM to Web Annotation (stam query -F w3anno)"}}
-    webanno["Web Annotations (JSONL / JSON-LD)"]
+    stam2webanno{{"STAM to Web Annotation\n(stam query -F w3anno)"}}
+    webanno["Web Annotations\n(JSONL / JSON-LD)"]
     importer{{"Importer (scripts/importer.py)"}}
     textrepo[/Text Repository/]
-    textrepodb[("Textrepo DB (Postgres & ElasticSearch)")]
+    textrepodb[("Textrepo DB\n(Postgres & ElasticSearch)")]
     annorepo[/AnnoRepo/]
-    annorepodb[("Annorepo DB (MongoDB)")]
+    annorepodb[("Annorepo DB\n(MongoDB)")]
     broccoli[/Broccoli/]
     textannoviz[/TextAnnoViz/]
 
