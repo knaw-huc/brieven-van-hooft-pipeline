@@ -118,7 +118,7 @@ flowchart TD
     stam2webanno --> webanno
     stam2webanno --> plaintext
     webanno --> importer
-    plaintext -> importer
+    plaintext --> importer
     importer -. "HTTP POST" .-> textrepo
     importer -. "HTTP POST" .-> annorepo
     textrepo -.-> broccoli
