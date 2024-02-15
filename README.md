@@ -98,7 +98,7 @@ flowchart TD
     webanno["Web Annotations (JSONL / JSON-LD)"]
     importer{{"Importer (scripts/importer.py)"}}
     textrepo[/Text Repository/]
-    textrepodb[("Textrepo DB (Postgres & ElasticSearch)"]
+    textrepodb[("Textrepo DB (Postgres & ElasticSearch)")]
     annorepo[/AnnoRepo/]
     annorepodb[("Annorepo DB (MongoDB)")]
     broccoli[/Broccoli/]
