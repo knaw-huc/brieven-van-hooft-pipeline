@@ -94,6 +94,7 @@ flowchart TD
     stamhtml[["Static HTML visualisations from STAM"]]
     folia2html{{folia2html}}
     foliahtml[["Static HTML visualisations from FoLiA"]]
+    stam2text[{"STAM to text\n(stam print)"}]
     stam2webanno{{"STAM to Web Annotation\n(stam query -F w3anno)"}}
     webanno["Web Annotations\n(JSONL / JSON-LD)"]
     plaintext["Plain text output"]
@@ -116,7 +117,8 @@ flowchart TD
     stamview --> stamhtml
     stamstore --> stam2webanno
     stam2webanno --> webanno
-    stam2webanno --> plaintext
+    stamstore --> stam2text
+    stam2text --> plaintext
     webanno --> importer
     plaintext --> importer
     importer -. "HTTP POST" .-> textrepo
