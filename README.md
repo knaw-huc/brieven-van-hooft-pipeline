@@ -94,10 +94,9 @@ flowchart TD
     stamhtml[["Static HTML visualisations from STAM"]]
     folia2html{{folia2html}}
     foliahtml[["Static HTML visualisations from FoLiA"]]
-    stam2text[{"STAM to text\n(stam print)"}]
     stam2webanno{{"STAM to Web Annotation\n(stam query -F w3anno)"}}
     webanno["Web Annotations\n(JSONL / JSON-LD)"]
-    plaintext["Plain text output"]
+    plaintext["plain text documents"]
     importer{{"Importer (scripts/importer.py)"}}
     textrepo[/Text Repository/]
     textrepodb[("Textrepo DB\n(Postgres & ElasticSearch)")]
@@ -113,19 +112,19 @@ flowchart TD
     folia_fixed --> folia2html
     folia2html --> foliahtml
     folia2stam --> stamstore
+    folia2stam --> plaintext
+    stamstore === plaintext
     stamstore --> stamview
     stamview --> stamhtml
     stamstore --> stam2webanno
     stam2webanno --> webanno
-    stamstore --> stam2text
-    stam2text --> plaintext
     webanno --> importer
     plaintext --> importer
     importer -. "HTTP POST" .-> textrepo
     importer -. "HTTP POST" .-> annorepo
     textrepo -.-> broccoli
-    textrepo --- textrepodb
-    annorepo --- annorepodb
+    textrepo === textrepodb
+    annorepo === annorepodb
     annorepo -.-> broccoli
     broccoli -.-> textannoviz
 ```
