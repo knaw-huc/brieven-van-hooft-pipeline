@@ -85,17 +85,42 @@ Some of the above may need some extension and tweaking in the scope of this proj
 
 ```mermaid
 flowchart TD
-    folia_input[[FoLiA XML input (with custom extensions)]]
+    folia_input[["FoLiA XML input (with custom extensions)"]]
     folia_fixed[[Sanitized FoLiA XML]]
-    fixfolia{fixfolia.py}
-    folia2stam{folia2stam}
-    stamstore[]
+    fixfolia{{scripts/fixfolia.py}}
+    folia2stam{{folia2stam}}
+    stamstore[Stand-off Text Annotation Model]
+    stamview{{"STAM to HTML (stam view)"}}
+    stamhtml[["Static HTML visualisations from STAM"]]
+    folia2html{{folia2html}}
+    foliahtml[["Static HTML visualisations from FoLiA"]]
+    stam2webanno{{"STAM to Web Annotation (stam query -F w3anno)"}}
+    webanno["Web Annotations (JSONL / JSON-LD)"]
+    importer{{"Importer (scripts/importer.py)"}}
+    textrepo[/TextRepo/]
+    textrepodb[(TextRepo DB)]
+    annorepo[/AnnoRepo/]
+    annorepodb[(AnnoRepo DB)]
+    broccoli[/Broccoli/]
+    textannoviz[/TextAnnoViz/]
+
+
     folia_input --> fixfolia 
     fixfolia --> folia_fixed
     folia_fixed --> folia2stam
+    folia_fixed --> folia2html
+    folia2html --> foliahtml
     folia2stam --> stamstore
-    stamstore --> {stamview}
-
+    stamstore --> stamview
+    stamview --> stamhtml
+    stamstore --> stam2webanno
+    stam2webanno --> webanno
+    webanno --> importer
+    importer -. "HTTP PUT" .-> textrepo
+    importer -. "HTTP PUT" .-> annorepo
+    textrepo -.-> broccoli
+    textrepo --- textrepodb
+    annorepo --- annorepodb
+    annorepo -.-> broccoli
+    broccoli -.-> textannoviz
 ```
-
-
