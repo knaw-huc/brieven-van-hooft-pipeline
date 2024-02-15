@@ -72,11 +72,30 @@ Some of the above may need some extension and tweaking in the scope of this proj
 
 ## Deliverables
 
-* **Software:** A conversion pipeline to take the current form of Brieven van Hooft and transforms it in such a way that it can be shown in TextAnnoViz. This git repository will primarily hold this implementation, its input and output.
+* **Software:** A conversion pipeline to take the current form of Brieven van Hooft and transform it in such a way that it can be shown in TextAnnoViz. This git repository will primarily hold this implementation, its input and output.
     * The pipeline includes some preprocessors to fix the FoLiA input, as the data authors added some extensions that renders the FoLiA invalid. (*Time estimate:* 8 hours)
     * **Software:** `stam2webanno` - STAM to W3C Web Annotation export. This STAM extension is already [formulated here](https://github.com/annotation/stam/tree/master/extensions/stam-webannotations) but is not implemented yet.
         * *Time estimate:* 40 hours
-* **Service:** TextAnnoViz service for Brieven van Hooft
-* **Data:** STAM model for Brieven van Hooft. This can be queried and visualised using low-level tools.
+* **Service:** TextAnnoViz service for Brieven van Hooft, allowing to interactively search and view the letters and annotations online.
+* **Data:** STAM model for Brieven van Hooft. This can be queried and visualised using low-level local tools.
 * **Data (optional):** Some static HTML visualisations provided via the STAM tooling, not reliant on any further infrastructure.
+* **Data (optional):** Some static HTML visualisations provided via the FoLiA tooling, not reliant on any further infrastructure.
+
+## Pipeline Architecture
+
+```mermaid
+flowchart TD
+    folia_input[[FoLiA XML input (with custom extensions)]]
+    folia_fixed[[Sanitized FoLiA XML]]
+    fixfolia{fixfolia.py}
+    folia2stam{folia2stam}
+    stamstore[]
+    folia_input --> fixfolia 
+    fixfolia --> folia_fixed
+    folia_fixed --> folia2stam
+    folia2stam --> stamstore
+    stamstore --> {stamview}
+
+```
+
 
