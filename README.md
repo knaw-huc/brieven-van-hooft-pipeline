@@ -97,10 +97,10 @@ flowchart TD
     stam2webanno{{"STAM to Web Annotation (stam query -F w3anno)"}}
     webanno["Web Annotations (JSONL / JSON-LD)"]
     importer{{"Importer (scripts/importer.py)"}}
-    textrepo[/TextRepo/]
-    textrepodb[(TextRepo DB)]
+    textrepo[/Text Repository/]
+    textrepodb[("Textrepo DB (Postgres & ElasticSearch)"]
     annorepo[/AnnoRepo/]
-    annorepodb[(AnnoRepo DB)]
+    annorepodb[("Annorepo DB (MongoDB)")]
     broccoli[/Broccoli/]
     textannoviz[/TextAnnoViz/]
 
