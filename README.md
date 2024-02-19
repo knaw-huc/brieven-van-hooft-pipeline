@@ -24,7 +24,7 @@ FoLiA and making it available as W3C Web Annotations.
 * The data consists of 333 FoLiA XML documents (75MB)
 * Each FoLiA document corresponds to a letter. The number in the filename does *NOT* correspond to the number of the letter.
 * The FoLiA XML has been annotated with some custom XML elements (which renders the FoLiA invalid so a correction needs to be applied before we can process it with regular FoLiA tools), fortunately the custom elements are well-documented.
-* The data carries two independent sets of part-of-speech and lemma annotations. One automated as outputted by [Frog](https://languagemachines.github.io/frog), and set of one manual annotations. The automated seems to have been done with the default Frog models which are trained on contemporary Dutch, so the accuracy will not be very good. The manual annotations are more interesting, and seem to use a custom tagset loosely derived from CGN, for part-of-speech tagging.
+* The data carries two independent sets of part-of-speech and lemma annotations. One automated as outputted by [Frog](https://languagemachines.github.io/frog), and set of one annotations that was done semi-automatically via Adelheid and manual post-correction in a tool called Gustave.. The Frog enrichment has been done with the Frog models which are trained on contemporary Dutch, so the accuracy will not be very good. The manual annotations are more interesting, and seem to use a custom tagset loosely derived from CGN, for part-of-speech tagging.
 * The data comes from three upstream sources (three books *"De briefwisseling van Pieter Corneliszoon Hooft*, edited by H.W van Tricht e.a., that together form a collection), plain text, TEI and PDF versions are published for all four:
     * <https://www.dbnl.org/tekst/hoof001hwva02_01/>
     * <https://www.dbnl.org/tekst/hoof001hwva03_01/>
@@ -55,9 +55,23 @@ extra effort.
 
 *Q: I assume we are mainly interested in the manual annotations?*
 
+Yes, but the automatic ones will also be preserved as the comparison might be
+interesting. In a later project, retraining might also be interesting.
+
+*Q: License for the FoLiA data?*
+
+The annotations are open, the actual text is still uncertain and Hennie & Marjo will contact DBNL.
+
 ## Use case
 
-*(Describe the wishes and requirements from the researcher's perspective)*
+Researchers want to be able to search and visualise the letters:
+    * based on patterns in the linguistic annotation (e.g. discovering double annotations), e.g. via CQL
+    * search on metadata (e.g correspondents, time period)
+    * they want to be able to search only in the text by van Hooft (not the editorial notes)
+    
+## Allocated time
+
+120 ~ 200 hours
 
 ## Requirements
 
@@ -74,8 +88,10 @@ Some of the above may need some extension and tweaking in the scope of this proj
 
 * **Software:** A conversion pipeline to take the current form of Brieven van Hooft and transform it in such a way that it can be shown in TextAnnoViz. This git repository will primarily hold this implementation, its input and output.
     * The pipeline includes some preprocessors to fix the FoLiA input, as the data authors added some extensions that renders the FoLiA invalid. (*Time estimate:* 8 hours)
-    * **Software:** STAM to W3C Web Annotation export. This STAM extension is already [formulated here](https://github.com/annotation/stam/tree/master/extensions/stam-webannotations) but is not implemented yet.
+    * **Software:** STAM to W3C Web Annotation export. This STAM extension is already [formulated here](https://github.com/annotation/stam/tree/master/extensions/stam-webannotations). It has been largely implemented already in preparation for this project.
         * *Time estimate:* 40 hours
+    * **Software:** `stam align` - Realign annotations against a new text resource. Needed to re-align the annotations from the FoLiA with the original text source.
+        * *Time estimate:* 20 hours
 * **Service:** TextAnnoViz service for Brieven van Hooft, allowing to interactively search and view the letters and annotations online.
 * **Data:** STAM model for Brieven van Hooft. This can be queried and visualised using low-level local tools.
 * **Data (optional):** Some static HTML visualisations provided via the STAM tooling, not reliant on any further infrastructure.
@@ -89,14 +105,20 @@ flowchart TD
     folia_fixed[[Sanitized FoLiA XML]]
     fixfolia{{scripts/fixfolia.py}}
     folia2stam{{folia2stam}}
-    stamstore[Stand-off Text Annotation Model]
+    stamstore[Stand-off Text Annotation Model\n(from FoLiA)]
+    stamstore2[Stand-off Text Annotation Model\n(realigned)]
     stamview{{"STAM to HTML\n(stam view)"}}
     stamhtml[["Static HTML visualisations from STAM"]]
     folia2html{{folia2html}}
     foliahtml[["Static HTML visualisations from FoLiA"]]
     stam2webanno{{"STAM to Web Annotation\n(stam query -F w3anno)"}}
     webanno["Web Annotations\n(JSONL / JSON-LD)"]
-    plaintext["plain text documents"]
+    foliaplaintext[["plain text letters"]]
+    dbnlplaintext[["DBNL plain text books"]]
+    stamalign["Realignment with text\n(stam align)"]
+
+
+
     importer{{"Importer (scripts/importer.py)"}}
     textrepo[/Text Repository/]
     textrepodb[("Textrepo DB\n(Postgres & ElasticSearch)")]
@@ -112,14 +134,21 @@ flowchart TD
     folia_fixed --> folia2html
     folia2html --> foliahtml
     folia2stam --> stamstore
-    folia2stam --> plaintext
-    stamstore === plaintext
-    stamstore --> stamview
+    folia2stam --> foliaplaintext
+    stamstore === foliaplaintext
+    stamstore --> stamalign
+    foliaplaintext --> stamalign
+    stamalign --> stamstore2
+    stamstore2 === dbnlplaintext
+    stamstore2 --> stamview
+    stamstore2 --> stam2webanno
     stamview --> stamhtml
-    stamstore --> stam2webanno
     stam2webanno --> webanno
+    dbnlplaintext --> importer
     webanno --> importer
-    plaintext --> importer
+    stamstore2 --> stamview
+    stamstore2 --> stam2webanno
+    foliaplaintext --> stamalign
     importer -. "HTTP POST" .-> textrepo
     importer -. "HTTP POST" .-> annorepo
     textrepo -.-> broccoli
