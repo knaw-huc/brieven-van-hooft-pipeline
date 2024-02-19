@@ -120,7 +120,7 @@ flowchart TD
     dbnlplaintext[["DBNL plain text books"]]
     stamalign{{"Realignment with original text\n(stam align)"}}
 
-    metadatacsv[["Metadata annotation\n(csv)\"]]
+    metadatacsv[["Metadata annotation\n(csv)"]]
     metadater{{"Metadata processor\n(scripts/metadata2stam.py)"}}
 
 
@@ -143,8 +143,8 @@ flowchart TD
     stamstore --> stamalign
     foliaplaintext --> stamalign
     dbnlplaintext --> stamalign
-    metadatacsv -> metadater
-    derivedplaintext -> metadater
+    metadatacsv --> metadater
+    derivedplaintext --> metadater
     stamalign --> metadater
     metadater --> stamstore2
     stamstore2 --> stamview
@@ -164,7 +164,7 @@ flowchart TD
     classDef process stroke:#00f,font-weight:bold
     classDef service stroke:#0f0,font-weight:bold
     classDef data stroke:#ff0,font-style:italic
-    class fixfolia,folia2stam,stamview,folia2html,stam2webanno,stamalign,importer process
+    class fixfolia,folia2stam,stamview,folia2html,stam2webanno,stamalign,importer,metadater process
     class textrepo,annorepo,textannoviz,broccoli service
-    class folia_input,folia_fixed,stamstore,stamstore2,foliaplaintext,dbnlplaintext,webanno,foliahtml,stamhtml data
+    class folia_input,folia_fixed,stamstore,stamstore2,foliaplaintext,dbnlplaintext,webanno,foliahtml,stamhtml,derivedplaintext,metadatacsv data
 ```
