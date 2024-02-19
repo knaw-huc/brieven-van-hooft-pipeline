@@ -38,6 +38,7 @@ FoLiA and making it available as W3C Web Annotations.
     * The original version contains footnotes (and references to them).
 * Lines may be tied together using hyphenation, no dehyphenation was performed prior to processing by Frog so this leads to incorrect tokens, sentence boundaries, paragraph boundaries and incorrect PoS/lemma tags. The authors have tried to remedy this in their manual annotation stage using custom alignment tags.
 * There is no data that ties the text documents to the original scans.
+* There are various metadata annotations that have been made outside of the FoLiA. For some, it is not yet clear what text they reference and if they can be recovered exactly!
 
 ### Questions
 
@@ -88,6 +89,7 @@ Some of the above may need some extension and tweaking in the scope of this proj
 
 * **Software:** A conversion pipeline to take the current form of Brieven van Hooft and transform it in such a way that it can be shown in TextAnnoViz. This git repository will primarily hold this implementation, its input and output.
     * The pipeline includes some preprocessors to fix the FoLiA input, as the data authors added some extensions that renders the FoLiA invalid. (*Time estimate:* 8 hours)
+    * The pipeline includes processors to ingest the sociolinguistic metadata that is not in the FoLiA (*Time estimate:* 8 hours)
     * **Software:** STAM to W3C Web Annotation export. This STAM extension is already [formulated here](https://github.com/annotation/stam/tree/master/extensions/stam-webannotations). It has been largely implemented already in preparation for this project.
         * *Time estimate:* 40 hours
     * **Software:** `stam align` - Realign annotations against a new text resource. Needed to re-align the annotations from the FoLiA with the original text source.
@@ -106,17 +108,20 @@ flowchart TD
     fixfolia{{scripts/fixfolia.py}}
     folia2stam{{folia2stam}}
     stamstore["Stand-off Text Annotation Model\n(from FoLiA)"]
-    stamstore2["Stand-off Text Annotation Model\n(realigned)"]
+    stamstore2["Stand-off Text Annotation Model\n(realigned + metadated)"]
     stamview{{"STAM to HTML\n(stam view)"}}
     stamhtml[["Static HTML visualisations from STAM"]]
     folia2html{{folia2html}}
     foliahtml[["Static HTML visualisations from FoLiA"]]
     stam2webanno{{"STAM to Web Annotation\n(stam query -F w3anno)"}}
     webanno["Web Annotations\n(JSONL / JSON-LD)"]
-    foliaplaintext[["plain text letters"]]
+    foliaplaintext[["plain text letters\n(via FoLiA)"]]
+    derivedplaintext[["plain text letters\n(from project)"]]
     dbnlplaintext[["DBNL plain text books"]]
     stamalign{{"Realignment with original text\n(stam align)"}}
 
+    metadatacsv[["Metadata annotation\n(csv)\"]]
+    metadater{{"Metadata processor\n(scripts/metadata2stam.py)"}}
 
 
     importer{{"Importer (scripts/importer.py)"}}
@@ -138,7 +143,10 @@ flowchart TD
     stamstore --> stamalign
     foliaplaintext --> stamalign
     dbnlplaintext --> stamalign
-    stamalign --> stamstore2
+    metadatacsv -> metadater
+    derivedplaintext -> metadater
+    stamalign --> metadater
+    metadater --> stamstore2
     stamstore2 --> stamview
     stamstore2 --> stam2webanno
     stamview --> stamhtml
