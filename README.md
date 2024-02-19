@@ -105,8 +105,8 @@ flowchart TD
     folia_fixed[[Sanitized FoLiA XML]]
     fixfolia{{scripts/fixfolia.py}}
     folia2stam{{folia2stam}}
-    stamstore[Stand-off Text Annotation Model\n(from FoLiA)]
-    stamstore2[Stand-off Text Annotation Model\n(realigned)]
+    stamstore["Stand-off Text Annotation Model\n(from FoLiA)"]
+    stamstore2["Stand-off Text Annotation Model\n(realigned)"]
     stamview{{"STAM to HTML\n(stam view)"}}
     stamhtml[["Static HTML visualisations from STAM"]]
     folia2html{{folia2html}}
@@ -115,7 +115,7 @@ flowchart TD
     webanno["Web Annotations\n(JSONL / JSON-LD)"]
     foliaplaintext[["plain text letters"]]
     dbnlplaintext[["DBNL plain text books"]]
-    stamalign["Realignment with text\n(stam align)"]
+    stamalign{{"Realignment with original text\n(stam align)"}}
 
 
 
@@ -133,22 +133,18 @@ flowchart TD
     folia_fixed --> folia2stam
     folia_fixed --> folia2html
     folia2html --> foliahtml
+    folia2html --> foliaplaintext
     folia2stam --> stamstore
-    folia2stam --> foliaplaintext
-    stamstore === foliaplaintext
     stamstore --> stamalign
     foliaplaintext --> stamalign
+    dbnlplaintext --> stamalign
     stamalign --> stamstore2
-    stamstore2 === dbnlplaintext
     stamstore2 --> stamview
     stamstore2 --> stam2webanno
     stamview --> stamhtml
     stam2webanno --> webanno
     dbnlplaintext --> importer
     webanno --> importer
-    stamstore2 --> stamview
-    stamstore2 --> stam2webanno
-    foliaplaintext --> stamalign
     importer -. "HTTP POST" .-> textrepo
     importer -. "HTTP POST" .-> annorepo
     textrepo -.-> broccoli
@@ -156,4 +152,11 @@ flowchart TD
     annorepo === annorepodb
     annorepo -.-> broccoli
     broccoli -.-> textannoviz
+
+    classDef process stroke:#00f,font-weight:bold
+    classDef service stroke:#0f0,font-weight:bold
+    classDef data stroke:#ff0,font-style:italic
+    class fixfolia,folia2stam,stamview,folia2html,stam2webanno,stamalign,importer process
+    class textrepo,annorepo,textannoviz,broccoli service
+    class folia_input,folia_fixed,stamstore,stamstore2,foliaplaintext,dbnlplaintext,webanno,foliahtml,stamhtml data
 ```
