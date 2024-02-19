@@ -133,7 +133,7 @@ flowchart TD
     folia_fixed --> folia2stam
     folia_fixed --> folia2html
     folia2html --> foliahtml
-    folia2html --> foliaplaintext
+    folia2stam --> foliaplaintext
     folia2stam --> stamstore
     stamstore --> stamalign
     foliaplaintext --> stamalign
