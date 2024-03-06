@@ -1,5 +1,5 @@
 .SHELLFLAGS = -o pipefail -c
-.PHONY: clean list all validation stam folia.html
+.PHONY: clean list all validation stam folia.html sourcetexts
 
 folia_merged := $(wildcard *.merged.xml)
 folia_fixed := $(folia_merged:%.merged.xml=%.fixed.xml)
@@ -34,6 +34,17 @@ validation: $(folia_validation)
 	@echo "--- Sanitizing FoLiA input ---">&2
 	if ! ../scripts/fixfolia.py "$<" > "$@" 2> err; then cat err; false; fi
 	cat err >> alignments.lst
+
+sourcetexts: hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
+
+hoof001hwva02.txt:
+	curl https://www.dbnl.org/nieuws/text.php\?id\=hoof001hwva02 > $@
+
+hoof001hwva03.txt:
+	curl https://www.dbnl.org/nieuws/text.php\?id\=hoof001hwva03 > $@
+
+hoof001hwva04.txt:
+	curl https://www.dbnl.org/nieuws/text.php\?id\=hoof001hwva04 > $@
 
 stam: hoof001hwva.store.stam.json
 
