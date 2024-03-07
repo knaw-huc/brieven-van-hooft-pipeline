@@ -63,17 +63,26 @@ hoof001hwva.tmpstore1.stam.json: $(folia_fixed)
 	folia2stam --id hoof001hwva -X $^
 	mv hoof001hwva.store.stam.json $@
 
-hoof001hwva.store.stam.json: hoof001hwva.tmpstore1.stam.json sourcetexts
+hoof001hwva.tmpstore2.stam.json: hoof001hwva.tmpstore1.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
 	@echo "--- Copying ---">&2
 	cp "$<" "$@"
 	@echo "--- Adding source texts ---">&2
 	stam annotate --resource hoof001hwva02.txt --resource hoof001hwva03.txt --resource hoof001hwva04.txt $@
 	@echo "--- Realignment with source texts (1/3) ---">&2
-	stam align --resource hoof001hwva02.txt $(shell ls hoof001hwva02_01_*.txt | sed -s "s/.txt//" | sed -s "s/^/--resource /" | tr "\n" " ") $@
+	stam align --verbose --resource hoof001hwva02.txt $(shell ls hoof001hwva02_01_*.txt | sed -s "s/.txt//" | sed -s "s/^/--resource /" | tr "\n" " ") $@
 	@echo "--- Realignment with source texts (2/3) ---">&2
-	stam align --resource hoof001hwva03.txt $(shell ls hoof001hwva03_01_*.txt | sed -s "s/.txt//" | sed -s "s/^/--resource /" | tr "\n" " ") $@
+	stam align --verbose --resource hoof001hwva03.txt $(shell ls hoof001hwva03_01_*.txt | sed -s "s/.txt//" | sed -s "s/^/--resource /" | tr "\n" " ") $@
 	@echo "--- Realignment with source texts (3/3) ---">&2
-	stam align --resource hoof001hwva04.txt $(shell ls hoof001hwva04_01_*.txt | sed -s "s/.txt//" | sed -s "s/^/--resource /" | tr "\n" " ") $@
+	stam align --verbose --resource hoof001hwva04.txt $(shell ls hoof001hwva04_01_*.txt | sed -s "s/.txt//" | sed -s "s/^/--resource /" | tr "\n" " ") $@
+
+hoof001hwva.store.stam.json: hoof001hwva.tmpstore2.stam.json transpositions.tsv
+	@echo "--- Copying ---">&2
+	cp "$<" "$@"
+	@echo "--- Transposing annotations ---">&2
+	stam transpose $(shell gawk '{ print "--transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' < transpositions.tsv | tr "\n" " ") $@
+
+transpositions.tsv: hoof001hwva.store.stam.json
+	stam export --alignments $< | cut -f 1,2,4 | sort -k3 | uniq > $@
 
 hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	@echo "--- Web Annotation export ---">&2
