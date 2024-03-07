@@ -79,7 +79,7 @@ hoof001hwva.store.stam.json: hoof001hwva.tmpstore2.stam.json transpositions.tsv
 	@echo "--- Copying ---">&2
 	cp "$<" "$@"
 	@echo "--- Transposing annotations ---">&2
-	stam transpose $(shell gawk '{ print "--transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' < transpositions.tsv | tr "\n" " ") $@
+	stam transpose --ignore-errors $(shell gawk '{ print "--transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' < transpositions.tsv | tr "\n" " ") $@
 
 transpositions.tsv: hoof001hwva.store.stam.json
 	stam export --alignments $< | cut -f 1,2,4 | sort -k3 | uniq > $@
