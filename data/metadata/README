@@ -1,0 +1,26 @@
+Beschrijving tabellen sociolinguistische annotatie
+
+letters.csv: verbindingstabel tussen correspondent-informatie en document-informatie
+id: volgnummer, uit de editie van Van Tricht (niet noodzakelijk volledig numeriek), gekoppeld aan id in categories.csv
+to_id: correspondent, gekoppeld aan id in correspondents.csv
+dated: datering brieven uit editie Van Tricht
+dbnl_id: bestandsnaam uit dbnl, gekoppeld aan dbnl_id in categories.csv
+
+correspondents.csv: eigenschappen van correspondenten
+id: volgnummer, gekoppeld aan to_id in letters.csv
+individual: 0 = organisatie of groep, 1 = individu
+name: naam (vrije invoer)
+function: beroep, type organisatie, type persoonlijke relatie (vrije invoer)
+gender: 0 = man, 1 = vrouw
+birth_year, death_year: alleen voor individuen. defaults: 1600, 1650
+literary: 1 = correspondent is een literair auteur, 0 = geen literair auteur
+function_unclear, birthyear_unclear, deathyear_unclear: 0 = annotator heeft informatie gevonden, 1 = annotator kon de informatie niet vaststellen
+
+categories.csv: eigenschappen van brieven
+id: volgnummer, uit de editie van Van Tricht (niet noodzakelijk volledig numeriek), gekoppeld aan id in letters.csv
+dbnl_id: bestandsnaam uit dbnl, gekoppeld aan dbnl_id in letters.csv
+business: 0 = persoonlijke brief, 1 = zakelijke brief
+accompanying: 0 = zelfstandige brief, 1 = begeleidende brief
+function: functie van de brief (vaste lijst)
+topic: onderwerp van de brief (vaste lijst)
+overige velden: briefstructuur. Vijf briefonderdelen met elk een begin en eind, in karakterposities. Lege velden representeren een ontbrekend briefonderdeel.
