@@ -21,7 +21,7 @@ except:
     exit(1)
 
 store = stam.AnnotationStore(id="hooft_bron")
-store.set_filename("hooft_bron.stam.store.json")
+store.set_filename("hooft_bron.store.stam.json")
 
 for filename in glob(os.path.join(sourcedir,"*.txt")):
     store.add_resource(filename)

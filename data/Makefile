@@ -75,17 +75,41 @@ hoof001hwva.tmpstore2.stam.json: hoof001hwva.tmpstore1.stam.json hoof001hwva02.t
 	@echo "--- Realignment with source texts (3/3) ---">&2
 	stam align --verbose --resource hoof001hwva04.txt $(shell ls hoof001hwva04_01_*.txt | sed -s "s/.txt//" | sed -s "s/^/--resource /" | tr "\n" " ") $@
 
+transpositions.tsv: hoof001hwva.tmpstore2.stam.json
+	stam export --alignments $< | cut -f 1,2,4 | sort -k3 | uniq > $@
+
 hoof001hwva.store.stam.json: hoof001hwva.tmpstore2.stam.json transpositions.tsv
 	@echo "--- Copying ---">&2
 	cp "$<" "$@"
 	@echo "--- Transposing annotations ---">&2
 	stam transpose --ignore-errors $(shell gawk '{ print "--transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' < transpositions.tsv | tr "\n" " ") $@
 
+
 hooft_bron.store.stam.json:
 	python ../scripts/metadata2stam.py hooft_bron metadata
 
-transpositions.tsv: hoof001hwva.store.stam.json
+hooft_bron_aligned.store.stam.json: hooft_bron.store.stam.json
+	@echo "--- Copying ---">&2
+	cp "$<" "$@"
+	@echo "--- Adding source texts ---">&2
+	stam annotate --resource hoof001hwva02.txt --resource hoof001hwva03.txt --resource hoof001hwva04.txt $@
+	@echo "--- Realignment with source texts (1/3) ---">&2
+	stam align --verbose --resource hoof001hwva02.txt $(shell ls hooft_bron/hoof001hwva02_01_*.txt | sed -s "s/^/--resource /" | tr "\n" " ") $@
+	@echo "--- Realignment with source texts (2/3) ---">&2
+	stam align --verbose --resource hoof001hwva03.txt $(shell ls hooft_bron/hoof001hwva03_01_*.txt | sed -s "s/^/--resource /" | tr "\n" " ") $@
+	@echo "--- Realignment with source texts (3/3) ---">&2
+	stam align --verbose --resource hoof001hwva04.txt $(shell ls hooft_bron/hoof001hwva04_01_*.txt | sed -s "s/^/--resource /" | tr "\n" " ") $@
+
+hooft_bron_transpositions.tsv: hooft_bron_aligned.store.stam.json
 	stam export --alignments $< | cut -f 1,2,4 | sort -k3 | uniq > $@
+
+hooft_bron_transposed.store.stam.json: hooft_bron_aligned.store.stam.json hooft_bron_transpositions.tsv
+	@echo "--- Copying ---">&2
+	cp "$<" "$@"
+	@echo "--- Transposing annotations ---">&2
+	stam transpose --ignore-errors $(shell gawk '{ print "--transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' < transpositions.tsv | tr "\n" " ") $@
+
+hoof001hwva.store.stam.json: hoof001hwva.tmpstore2.stam.json transpositions.tsv
 
 hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	@echo "--- Web Annotation export ---">&2
