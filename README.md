@@ -118,10 +118,10 @@ flowchart TD
     foliaplaintext[["plain text letters\n(via FoLiA)"]]
     derivedplaintext[["plain text letters\n(from project)"]]
     dbnlplaintext[["DBNL plain text books"]]
-    stamalign{{"Realignment with original text\n(stam align)"}}
+    stamalign{{"Realignment of FoLiA output\nwith DBNL source text\n(stam align + stam transpose)"}}
 
     metadatacsv[["Metadata annotation\n(csv)"]]
-    metadater{{"Metadata processor\n(scripts/metadata2stam.py)"}}
+    metadater{{"Metadata processor\n(scripts/metadata2stam.py)\nand realignment of old input\nwith DBNL source text\n(stam align + stam transpose)"}}
 
 
     importer{{"Importer (scripts/importer.py)"}}
