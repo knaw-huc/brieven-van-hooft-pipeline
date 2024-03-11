@@ -146,7 +146,7 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
                         "value": True if correspondents[correspondent_id]['deathyear_unclear'] == "1" else False,
                     }
                 )
-        store.annotate(target, data)
+            store.annotate(target, data)
 
         if row['greeting_start'] != "" and row['greeting_end'] != "":
             target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['greeting_start']), int(row['greeting_end'])))
