@@ -145,8 +145,8 @@ flowchart TD
     derivedplaintext --> metadater
     metadater --> stamstore2
     stamstore2 --> metadataalign
-    stamalign -> stamsave
-    metadataalign -> stamsave
+    stamalign --> stamsave
+    metadataalign --> stamsave
     stamsave --> stamstorefinal
     stamstorefinal --> stamview
     stamstorefinal --> stam2webanno
