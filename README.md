@@ -108,7 +108,8 @@ flowchart TD
     fixfolia{{scripts/fixfolia.py}}
     folia2stam{{folia2stam}}
     stamstore["Stand-off Text Annotation Model\n(from FoLiA)"]
-    stamstore2["Stand-off Text Annotation Model\n(realigned + metadated)"]
+    stamstore2["Stand-off Text Annotation Model\n(from metadata)"]
+    stamstorefinal["Stand-off Text Annotation Model\n(realigned + metadated)"]
     stamview{{"STAM to HTML\n(stam view)"}}
     stamhtml[["Static HTML visualisations from STAM"]]
     folia2html{{folia2html}}
@@ -119,11 +120,10 @@ flowchart TD
     derivedplaintext[["plain text letters\n(from project)"]]
     dbnlplaintext[["DBNL plain text books"]]
     stamalign{{"Realignment of FoLiA output\nwith DBNL source text\n(stam align + stam transpose)"}}
-
     metadatacsv[["Metadata annotation\n(csv)"]]
-    metadater{{"Metadata processor\n(scripts/metadata2stam.py)\nand realignment of old input\nwith DBNL source text\n(stam align + stam transpose)"}}
-
-
+    metadater{{"Metadata processor\n(scripts/metadata2stam.py)"}}
+    metadataalign{{"Realignment old input\nwith DBNL source text\n(stam align + stam transpose)"}}
+    stamsave{{"Merge two models\n(stam save)"}}
     importer{{"Importer (scripts/importer.py)"}}
     textrepo[/Text Repository/]
     textrepodb[("Textrepo DB\n(Postgres & ElasticSearch)")]
@@ -131,8 +131,6 @@ flowchart TD
     annorepodb[("Annorepo DB\n(MongoDB)")]
     broccoli[/Broccoli/]
     textannoviz[/TextAnnoViz/]
-
-
     folia_input --> fixfolia 
     fixfolia --> folia_fixed
     folia_fixed --> folia2stam
@@ -145,10 +143,13 @@ flowchart TD
     dbnlplaintext --> stamalign
     metadatacsv --> metadater
     derivedplaintext --> metadater
-    stamalign --> metadater
     metadater --> stamstore2
-    stamstore2 --> stamview
-    stamstore2 --> stam2webanno
+    stamstore2 --> metadataalign
+    stamalign -> stamsave
+    metadataalign -> stamsave
+    stamsave --> stamstorefinal
+    stamstorefinal --> stamview
+    stamstorefinal --> stam2webanno
     stamview --> stamhtml
     stam2webanno --> webanno
     dbnlplaintext --> importer
@@ -164,7 +165,7 @@ flowchart TD
     classDef process stroke:#00f,font-weight:bold
     classDef service stroke:#0f0,font-weight:bold
     classDef data stroke:#ff0,font-style:italic
-    class fixfolia,folia2stam,stamview,folia2html,stam2webanno,stamalign,importer,metadater process
+    class fixfolia,folia2stam,stamview,folia2html,stam2webanno,stamalign,importer,metadater,metadataalign,stamsave process
     class textrepo,annorepo,textannoviz,broccoli service
-    class folia_input,folia_fixed,stamstore,stamstore2,foliaplaintext,dbnlplaintext,webanno,foliahtml,stamhtml,derivedplaintext,metadatacsv data
+    class folia_input,folia_fixed,stamstore,stamstore2,stamstorefinal,foliaplaintext,dbnlplaintext,webanno,foliahtml,stamhtml,derivedplaintext,metadatacsv data
 ```
