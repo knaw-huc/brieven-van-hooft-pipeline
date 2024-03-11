@@ -141,6 +141,7 @@ flowchart TD
     stamstore --> stamalign
     foliaplaintext --> stamalign
     dbnlplaintext --> stamalign
+    dbnlplaintext --> metadataalign
     metadatacsv --> metadater
     derivedplaintext --> metadater
     metadater --> stamstore2
