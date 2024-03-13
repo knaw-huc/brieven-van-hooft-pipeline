@@ -135,18 +135,18 @@ hoof001hwva.jsonl: hoof001hwva.store.stam.json
 
 upload: hoof001hwva.jsonl hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
 	@echo "--- Upload data into TextRepo & AnnoRepo ---">&2
-	ifeq ($(origin TEXTREPO_URL),undefined)
+ifeq ($(TEXTREPO_URL),)
 		$(error TEXTREPO_URL not set)
-	endif
-	ifeq ($(origin TEXTREPO_KEY),undefined)
+endif
+ifeq ($(TEXTREPO_KEY),)
 		$(error TEXTREPO_KEY not set)
-	endif
-	ifeq ($(origin ANNOREPO_URL),undefined)
+endif
+ifeq ($(ANNOREPO_URL),)
 		$(error ANNOREPO_URL not set)
-	endif
-	ifeq ($(origin ANNOREPO_KEY),undefined)
+endif
+ifeq ($(ANNOREPO_KEY),)
 		$(error ANNOREPO_KEY not set)
-	endif
+endif
 	../scripts/uploader.py --textrepo-url $(TEXTREPO_URL) --textrepo-key $(TEXTREPO_KEY) --annorepo-url $(ANNOREPO_URL) --annorepo-key $(ANNOREPO_KEY) --webannotations $< hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
 	
 
