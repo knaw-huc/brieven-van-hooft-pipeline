@@ -1,5 +1,5 @@
 .SHELLFLAGS = -o pipefail -c
-.PHONY: clean list all validation stam folia.html sourcetexts
+.PHONY: clean list all validation stam folia.html sourcetexts upload
 .DELETE_ON_ERROR:
 
 folia_merged := $(wildcard *.merged.xml)
@@ -134,3 +134,24 @@ hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	@echo "--- Web Annotation export ---">&2
 	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "pos: urn:brievenvanhooft:dataset/gustave-pos/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "urn:brievenvanhooft:resource" --use "pos" --query 'SELECT ANNOTATION ?pos WHERE DATA "gustave-pos" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json > $@
 	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "lem: urn:brievenvanhooft:dataset/gustave-lem/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "urn:brievenvanhooft:resource" --use "lem" --query 'SELECT ANNOTATION ?lem WHERE DATA "gustave-lem" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json >> $@
+
+upload: hoof001hwva.jsonl hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
+	@echo "--- Upload data into TextRepo & AnnoRepo ---">&2
+	ifeq ($(origin TEXTREPO_URL),undefined)
+		$(error TEXTREPO_URL not set)
+	endif
+	ifeq ($(origin TEXTREPO_KEY),undefined)
+		$(error TEXTREPO_KEY not set)
+	endif
+	ifeq ($(origin ANNOREPO_URL),undefined)
+		$(error ANNOREPO_URL not set)
+	endif
+	ifeq ($(origin ANNOREPO_KEY),undefined)
+		$(error ANNOREPO_KEY not set)
+	endif
+	../scripts/uploader.py --textrepo-url $(TEXTREPO_URL) --textrepo-key $(TEXTREPO_KEY) --annorepo-url $(ANNOREPO_URL) --annorepo-key $(ANNOREPO_KEY) --webannotations $< hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
+	
+
+
+
+

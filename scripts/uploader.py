@@ -11,7 +11,7 @@ from annorepo.client import AnnoRepoClient
 PROJECT_ID="brieven-van-hooft"
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog="Importer", description="Imports Web Annotations and Texts, as outputted by STAM, into AnnoRepo and TextRepo") 
+    parser = argparse.ArgumentParser(prog="Importer", description="Uploads Web Annotations and Texts, as outputted by STAM, to AnnoRepo and TextRepo") 
     parser.add_argument('textresources', nargs='+', help="Plain text resources", type=str) 
     parser.add_argument('--textrepo-url', help="URL to the textrepo instance", type=str, action="store", required=True, default="https://brieven-van-hooft.tt.di.huc.knaw.nl/") 
     parser.add_argument('--textrepo-key', help="API key for textrepo", type=str, action="store", required=True) 
