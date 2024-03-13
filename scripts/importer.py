@@ -17,7 +17,7 @@ if __name__ == "__main__":
     parser.add_argument('--textrepo-key', help="API key for textrepo", type=str, action="store", required=True) 
     parser.add_argument('--annorepo-url', help="URL to the annorepo instance", type=str, action="store", required=True, default="https://brieven-van-hooft.annorepo.dev.clariah.nl/") 
     parser.add_argument('--annorepo-key', help="API key for annorepo", type=str, action="store", required=True) 
-    parser.add_argument('--webannotations','-a', help="JSON List of all web annotations", type=str, action="store", required=True) 
+    parser.add_argument('--webannotations','-a', help="Filename to a JSON List of all web annotations", type=str, action="store", required=True) 
 
     args = parser.parse_args()
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
     chunk = []
     CHUNK_SIZE = 150
     print(f"Processing annotations...", file=sys.stderr)
-    with open(sys.argv[1],'rb') as f:
+    with open(args.webannotations,'rb') as f:
         for line in f:
             webannotation = json.loads(line)
 
