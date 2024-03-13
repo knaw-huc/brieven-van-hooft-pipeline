@@ -11,7 +11,7 @@ from annorepo.client import AnnoRepoClient
 PROJECT_ID="brieven-van-hooft"
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog="Importer", description="Uploads Web Annotations and Texts, as outputted by STAM, to AnnoRepo and TextRepo") 
+    parser = argparse.ArgumentParser(prog="Uploader", description="Uploads Web Annotations and Texts, as outputted by STAM, to AnnoRepo and TextRepo") 
     parser.add_argument('textresources', nargs='+', help="Plain text resources", type=str) 
     parser.add_argument('--textrepo-url', help="URL to the textrepo instance", type=str, action="store", required=True, default="https://brieven-van-hooft.tt.di.huc.knaw.nl/") 
     parser.add_argument('--textrepo-key', help="API key for textrepo", type=str, action="store", required=True) 
@@ -53,9 +53,16 @@ if __name__ == "__main__":
             webannotation = json.loads(line)
 
             #substitute old target resource for new URI in textrepo
-            filename = webannotation['target']['source'].replace("urn:brievenvanhooft:resource/","") #strip old prefix
-            uri = resource2urimap[filename]
-            webannotation['target']['source'] = uri
+            if 'source' in webannotation['target']:
+                filename = webannotation['target']['source'].replace("urn:brievenvanhooft:resource/","") #strip old prefix
+                uri = resource2urimap[filename]
+                webannotation['target']['source'] = uri
+            elif 'items' in webannotation['target']: #target may be composite:
+                for item in webannotation['items']:
+                    if 'source' in item:
+                        filename = item['source'].replace("urn:brievenvanhooft:resource/","") #strip old prefix
+                        uri = resource2urimap[filename]
+                        item['source'] = uri
 
             if len(chunk) >= CHUNK_SIZE:
                 chunks.append(chunk)
