@@ -27,14 +27,21 @@ if __name__ == "__main__":
     arclient = AnnoRepoClient(args.annorepo_url, verbose=True,api_key=args.annorepo_key)
     AR_CONTAINER_URI = f"{args.annorepo_url}/w3c/{PROJECT_ID}"
 
+    #create file type
+    filetype = "segmented_text"
+    available_type_names = [t.name for t in trclient.read_file_types()]
+    if filetype not in available_type_names:
+        trclient.create_file_type(name=filetype, mimetype="application/json")
+
     for textfile in args.textresources:
         external_id = ".".join(os.path.basename(textfile).split(".")[:-1]) #strip extension
 
         #encapsulate the plain text format in the JSON format TextRepo expects  _ordered_segments (with only one huge segment containing the whole edition)
         with open(textfile,'r',encoding='utf-8') as f:
             jsonresource = { "_ordered_segments": [ f.read() ] }
-        print(f"Uploading {textfile} to TextRepo...", file=sys.stderr)
-        version = trclient.import_version(external_id, type_name="segmented_text", contents=json.dumps(jsonresource, ensure_ascii=False), allow_new_document=True, as_latest_version=True)
+        contents = json.dumps(jsonresource, ensure_ascii=False)
+        print(f"Uploading {textfile} ({len(contents.encode('utf-8'))} bytes) to TextRepo...", file=sys.stderr)
+        version = trclient.import_version(external_id, type_name=filetype, contents=contents, allow_new_document=True, as_latest_version=True)
         
         #keep the map
         resource2urimap[external_id] = f"{trclient.base_uri}/rest/versions/{version.version_id}"
