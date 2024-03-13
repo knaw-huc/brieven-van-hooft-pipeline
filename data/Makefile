@@ -33,7 +33,7 @@ cleanstam:
 	-rm hoof*.txt
 	-rm hoof*.stam.html
 	-rm *.batch
-	-rm *.transitions.tsv
+	-rm *.transpositions.tsv
 
 list: $(folia_merged)
 	@ls $^
@@ -80,9 +80,9 @@ hoof001hwva.fromfolia.store.stam.json: $(folia_fixed)
 	mv hoof001hwva.store.stam.json $@
 
 hoof001hwva.align.stam.batch: hoof001hwva.fromfolia.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-	for FILE in ${sourcetexts_2_noext}; do echo "align --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
-	for FILE in ${sourcetexts_3_noext}; do echo "align --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
-	for FILE in ${sourcetexts_4_noext}; do echo "align --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
+	for FILE in ${sourcetexts_2_noext}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
+	for FILE in ${sourcetexts_3_noext}; do echo "align --trim --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
+	for FILE in ${sourcetexts_4_noext}; do echo "align --trim --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
 
 hoof001hwva.aligned.store.stam.json: hoof001hwva.fromfolia.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt hoof001hwva.align.stam.batch
 	@echo "--- Adding source texts ---">&2
@@ -108,9 +108,9 @@ hooft_bron.store.stam.json:
 	python ../scripts/metadata2stam.py hooft_bron metadata
 
 hooft_bron_align.stam.batch: hooft_bron.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-	for FILE in ${metadata_sourcetexts_2}; do echo "align --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
-	for FILE in ${metadata_sourcetexts_3}; do echo "align --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
-	for FILE in ${metadata_sourcetexts_4}; do echo "align --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
+	for FILE in ${metadata_sourcetexts_2}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
+	for FILE in ${metadata_sourcetexts_3}; do echo "align --trim --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
+	for FILE in ${metadata_sourcetexts_4}; do echo "align --trim --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
 
 hooft_bron_aligned.store.stam.json: hooft_bron.store.stam.json hooft_bron_align.stam.batch
 	@echo "--- Adding source texts ---">&2
