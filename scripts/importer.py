@@ -46,6 +46,7 @@ if __name__ == "__main__":
     chunks = []
     chunk = []
     CHUNK_SIZE = 150
+    count = 0
     print(f"Processing annotations...", file=sys.stderr)
     with open(args.webannotations,'rb') as f:
         for line in f:
@@ -60,6 +61,9 @@ if __name__ == "__main__":
                 chunks.append(chunk)
                 chunk = []
             chunk.append(webannotation)
+            count += 1
+
+    print(f"Processed {count} annotations", file=sys.stderr)
 
     for i, chunk in enumerate(chunks):
         print(f"Uploading annotations chunk ({i + 1}/{len(chunks)}) to AnnoRepo...", file=sys.stderr)
