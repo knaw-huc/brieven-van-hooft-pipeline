@@ -11,6 +11,9 @@ folia_html := $(folia_merged:%.merged.xml=%.folia.html)
 sourcetexts_2 := $(wildcard hoof001hwva02_01_*.txt)
 sourcetexts_3 := $(wildcard hoof001hwva03_01_*.txt)
 sourcetexts_4 := $(wildcard hoof001hwva04_01_*.txt)
+sourcetexts_2_noext := $(sourcetexts_2:%.txt=%)
+sourcetexts_3_noext := $(sourcetexts_3:%.txt=%)
+sourcetexts_4_noext := $(sourcetexts_4:%.txt=%)
 metadata_sourcetexts_2 := $(wildcard hooft_bron/hoof001hwva02_01_*.txt)
 metadata_sourcetexts_3 := $(wildcard hooft_bron/hoof001hwva03_01_*.txt)
 metadata_sourcetexts_4 := $(wildcard hooft_bron/hoof001hwva04_01_*.txt)
@@ -77,9 +80,9 @@ hoof001hwva.fromfolia.store.stam.json: $(folia_fixed)
 	mv hoof001hwva.store.stam.json $@
 
 hoof001hwva.align.stam.batch: hoof001hwva.fromfolia.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-	for FILE in ${sourcetexts_2}; do echo "align --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
-	for FILE in ${sourcetexts_3}; do echo "align --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
-	for FILE in ${sourcetexts_4}; do echo "align --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
+	for FILE in ${sourcetexts_2_noext}; do echo "align --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
+	for FILE in ${sourcetexts_3_noext}; do echo "align --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
+	for FILE in ${sourcetexts_4_noext}; do echo "align --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
 
 hoof001hwva.aligned.store.stam.json: hoof001hwva.fromfolia.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt hoof001hwva.align.stam.batch
 	@echo "--- Adding source texts ---">&2
