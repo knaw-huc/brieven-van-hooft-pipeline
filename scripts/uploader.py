@@ -24,12 +24,8 @@ if __name__ == "__main__":
     resource2urimap = {}
 
     trclient = TextRepoClient(args.textrepo_url, verbose=False, api_key=args.textrepo_key)
-    arclient = AnnoRepoClient(args.annorepo_url, verbose=False,api_key=args.annorepo_key)
+    arclient = AnnoRepoClient(args.annorepo_url, verbose=True,api_key=args.annorepo_key)
     AR_CONTAINER_URI = f"{args.annorepo_url}/w3c/{PROJECT_ID}"
-
-    if not arclient.has_container(PROJECT_ID):
-        print(f"Creating container for AnnoRepo...", file=sys.stderr)
-        arclient.create_container(name=PROJECT_ID, label="Brieven van Hooft")
 
     for textfile in args.textresources:
         external_id = ".".join(os.path.basename(textfile).split(".")[:-1]) #strip extension
@@ -42,6 +38,10 @@ if __name__ == "__main__":
         
         #keep the map
         resource2urimap[external_id] = f"{trclient.base_uri}/rest/versions/{version.version_id}"
+
+    if not arclient.has_container(PROJECT_ID):
+        print(f"Creating container for AnnoRepo...", file=sys.stderr)
+        arclient.create_container(name=PROJECT_ID, label="Brieven van Hooft")
 
     chunks = []
     chunk = []
