@@ -210,7 +210,13 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
                         "value": True if correspondents[correspondent_id]['deathyear_unclear'] == "1" else False,
                     }
                 )
-        store.annotate(target, data)
+        
+        kwargs = {}
+        if mode == Mode.POST:
+            kwargs['id'] = row['dbnl_id'] #use DBNL ID as annotation ID in final result
+
+        store.annotate(target, data, **kwargs)
+
 
         if mode == Mode.PRE:
             if row['greeting_start'] != "" and row['greeting_end'] != "":
