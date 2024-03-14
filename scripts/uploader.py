@@ -34,17 +34,19 @@ if __name__ == "__main__":
         trclient.create_file_type(name=filetype, mimetype="application/json")
 
     for textfile in args.textresources:
-        external_id = ".".join(os.path.basename(textfile).split(".")[:-1]) #strip extension
+        external_id = os.path.basename(textfile)
 
         #encapsulate the plain text format in the JSON format TextRepo expects  _ordered_segments (with only one huge segment containing the whole edition)
         with open(textfile,'r',encoding='utf-8') as f:
             jsonresource = { "_ordered_segments": [ f.read() ] }
         contents = json.dumps(jsonresource, ensure_ascii=False)
-        print(f"Uploading {textfile} ({len(contents.encode('utf-8'))} bytes) to TextRepo...", file=sys.stderr)
+        print(f"Uploading {textfile} ({len(contents.encode('utf-8'))} bytes, ID={external_id}) to TextRepo...", file=sys.stderr)
         version = trclient.import_version(external_id, type_name=filetype, contents=contents, allow_new_document=True, as_latest_version=True)
         
-        #keep the map
-        resource2urimap[external_id] = f"{trclient.base_uri}/rest/versions/{version.version_id}"
+        #populate the map
+        uri = f"{trclient.base_uri}/rest/versions/{version.version_id}"
+        resource2urimap[external_id] = uri
+        print(f"  Published as {uri}",file=sys.stderr)
 
     if not arclient.has_container(PROJECT_ID):
         print(f"Creating container for AnnoRepo...", file=sys.stderr)
@@ -62,12 +64,18 @@ if __name__ == "__main__":
             #substitute old target resource for new URI in textrepo
             if 'source' in webannotation['target']:
                 filename = webannotation['target']['source'].replace("urn:brievenvanhooft:resource/","") #strip old prefix
+                if filename not in resource2urimap:
+                    print(f"[error] File '{filename}' is not a known target, must be one of the text resources passed",file=sys.stderr)
+                    sys.exit(1)
                 uri = resource2urimap[filename]
                 webannotation['target']['source'] = uri
             elif 'items' in webannotation['target']: #target may be composite:
-                for item in webannotation['items']:
+                for item in webannotation['target']['items']:
                     if 'source' in item:
                         filename = item['source'].replace("urn:brievenvanhooft:resource/","") #strip old prefix
+                        if filename not in resource2urimap:
+                            print(f"[error] File '{filename}' is not a known target, must be one of the text resources passed",file=sys.stderr)
+                            sys.exit(1)
                         uri = resource2urimap[filename]
                         item['source'] = uri
 
