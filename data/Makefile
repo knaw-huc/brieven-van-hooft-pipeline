@@ -131,6 +131,10 @@ hooft_bron_transposed.store.stam.json: hooft_bron_aligned.store.stam.json hooft_
 	@echo "--- Transposing annotations ---">&2
 	cat hooft_bron_transpose.stam.batch | stam batch --output $@ $<
 
+%.edition.html: %.txt hoof001hwva.store.stam.json
+	@echo "--- HTML edition visualisation via STAM ---">&2
+	stam view --query "SELECT RESOURCE ?edition WHERE ID \"$<\";" --query '@VALUETAG SELECT ANNOTATION ?pos WHERE RESOURCE ?edition; DATA "gustave-pos" "class";' --query '@VALUETAG SELECT ANNOTATION ?lemma WHERE RESOURCE ?edition; DATA "gustave-lem" "class";' hoof001hwva.store.stam.json > $@
+
 hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	@echo "--- Web Annotation export ---">&2
 	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "pos: urn:brievenvanhooft:dataset/gustave-pos/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "urn:brievenvanhooft:resource" --use "pos" --query 'SELECT ANNOTATION ?pos WHERE DATA "gustave-pos" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json > $@
