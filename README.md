@@ -124,7 +124,7 @@ flowchart TD
     metadater{{"Metadata processor\n(scripts/metadata2stam.py)"}}
     metadataalign{{"Realignment old input\nwith DBNL source text\n(stam align + stam transpose)"}}
     stamsave{{"Merge two models\n(stam save)"}}
-    importer{{"Importer (scripts/importer.py)"}}
+    uploader{{"uploader (scripts/uploader.py)"}}
     textrepo[/Text Repository/]
     textrepodb[("Textrepo DB\n(Postgres & ElasticSearch)")]
     annorepo[/AnnoRepo/]
@@ -153,10 +153,10 @@ flowchart TD
     stamstorefinal --> stam2webanno
     stamview --> stamhtml
     stam2webanno --> webanno
-    dbnlplaintext --> importer
-    webanno --> importer
-    importer -. "HTTP POST" .-> textrepo
-    importer -. "HTTP POST" .-> annorepo
+    dbnlplaintext --> uploader
+    webanno --> uploader
+    uploader -. "HTTP POST" .-> textrepo
+    uploader -. "HTTP POST" .-> annorepo
     textrepo -.-> broccoli
     textrepo === textrepodb
     annorepo === annorepodb
@@ -166,7 +166,7 @@ flowchart TD
     classDef process stroke:#00f,font-weight:bold
     classDef service stroke:#0f0,font-weight:bold
     classDef data stroke:#ff0,font-style:italic
-    class fixfolia,folia2stam,stamview,folia2html,stam2webanno,stamalign,importer,metadater,metadataalign,stamsave process
+    class fixfolia,folia2stam,stamview,folia2html,stam2webanno,stamalign,uploader,metadater,metadataalign,stamsave process
     class textrepo,annorepo,textannoviz,broccoli service
     class folia_input,folia_fixed,stamstore,stamstore2,stamstorefinal,foliaplaintext,dbnlplaintext,webanno,foliahtml,stamhtml,derivedplaintext,metadatacsv data
 ```
