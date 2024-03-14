@@ -99,41 +99,43 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
         else:
             raise Exception("Invalid mode")
 
-        store.annotate(target, {
-            "set": "brieven-van-hooft-categories",
-            "key": "type",
-            "value": "business" if row['business'] == "1" else "private"
-        })
-        store.annotate(target, {
-            "set": "brieven-van-hooft-categories",
-            "key": "dependency",
-            "value": "independent" if row['accompanying'] == "0" else "accompanying"
-        })
-        store.annotate(target, {
-            "set": "brieven-van-hooft-categories",
-            "key": "function",
-            "value": row['function']
-        })
-        store.annotate(target, {
-            "set": "brieven-van-hooft-categories",
-            "key": "topic",
-            "value": row['topic']
-        })
-        store.annotate(target, {
-            "set": "brieven-van-hooft-metadata",
-            "key": "dbnl_id",
-            "value": row['dbnl_id']
-        })
-        store.annotate(target, {
-            "set": "brieven-van-hooft-metadata",
-            "key": "letter_id",
-            "value": row['id']
-        })
-        store.annotate(target, {
-            "set": "brieven-van-hooft-metadata",
-            "key": "dated",
-            "value": letters[row['id']]['dated']
-        })
+        data = [
+            {
+                "set": "brieven-van-hooft-categories",
+                "key": "type",
+                "value": "business" if row['business'] == "1" else "private"
+            },
+            {
+                "set": "brieven-van-hooft-categories",
+                "key": "dependency",
+                "value": "independent" if row['accompanying'] == "0" else "accompanying"
+            },
+             {
+                "set": "brieven-van-hooft-categories",
+                "key": "function",
+                "value": row['function']
+            },
+             {
+                "set": "brieven-van-hooft-categories",
+                "key": "topic",
+                "value": row['topic']
+            },
+            {
+                "set": "brieven-van-hooft-metadata",
+                "key": "dbnl_id",
+                "value": row['dbnl_id']
+            },
+            {
+                "set": "brieven-van-hooft-metadata",
+                "key": "letter_id",
+                "value": row['id']
+            },
+            {
+                "set": "brieven-van-hooft-metadata",
+                "key": "dated",
+                "value": letters[row['id']]['dated']
+            }
+        ]
         correspondent_id = letters[row['id']]['to_id']
         if correspondent_id not in correspondents:
             print(f"WARNING: Correspondent ID {correspondent_id} was not defined.. Skipping", file=sys.stderr)
@@ -208,7 +210,7 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
                         "value": True if correspondents[correspondent_id]['deathyear_unclear'] == "1" else False,
                     }
                 )
-            store.annotate(target, data)
+        store.annotate(target, data)
 
         if mode == Mode.PRE:
             if row['greeting_start'] != "" and row['greeting_end'] != "":
