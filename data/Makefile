@@ -1,5 +1,5 @@
 .SHELLFLAGS = -o pipefail -c
-.PHONY: clean list all validation stam folia.html sourcetexts upload
+.PHONY: clean list all validation stam folia.html sourcetexts upload flush flushtextrepo flushannorepo
 .DELETE_ON_ERROR:
 
 folia_merged := $(wildcard *.merged.xml)
@@ -148,6 +148,21 @@ ifeq ($(ANNOREPO_KEY),)
 		$(error ANNOREPO_KEY not set)
 endif
 	../scripts/uploader.py --textrepo-url $(TEXTREPO_URL) --textrepo-key $(TEXTREPO_KEY) --annorepo-url $(ANNOREPO_URL) --annorepo-key $(ANNOREPO_KEY) --webannotations $< hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
+
+flushannorepo:
+	@echo "--- Flush remote database for AnnoRepo ---">&2
+ifeq ($(ANNOREPO_URL),)
+		$(error ANNOREPO_URL not set)
+endif
+ifeq ($(ANNOREPO_KEY),)
+		$(error ANNOREPO_KEY not set)
+endif
+	curl -I --etag-save etag --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/w3c/brieven-van-hooft/"
+	curl -X DELETE -H 'If-Match: $(shell cat etag)' --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/w3c/brieven-van-hooft/?force=true"
+
+flush: flushannorepo
+
+
 	
 
 
