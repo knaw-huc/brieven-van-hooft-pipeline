@@ -103,9 +103,12 @@ hoof001hwva.transposed.store.stam.json: hoof001hwva.aligned.store.stam.json tran
 hoof001hwva.store.stam.json: hoof001hwva.transposed.store.stam.json hooft_bron_transposed.store.stam.json 
 	@echo "--- Merging annotation stores ---">&2
 	stam init --output $@ $^
+	@echo "--- Adding final metadata ---">&2
+	python ../scripts/metadata2stam.py hooft_bron metadata $@   #existing file, will augment
 
 hooft_bron.store.stam.json:
-	python ../scripts/metadata2stam.py hooft_bron metadata
+	-rm $@
+	python ../scripts/metadata2stam.py hooft_bron metadata $@  #non-existing file, will be created
 
 hooft_bron_align.stam.batch: hooft_bron.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
 	for FILE in ${metadata_sourcetexts_2}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" > $@; done

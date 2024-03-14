@@ -4,7 +4,13 @@ import sys
 import stam
 import os.path
 import csv
+from collections import defaultdict
 from glob import glob
+from enum import Enum
+
+class Mode(Enum):
+    PRE = 0 #pre-transposition/alignment, will create a new annotation store from scratch
+    POST = 1 #post-transposition/alignment, will enrich an existing annotation store
 
 try:
     sourcedir = sys.argv[1]
@@ -17,14 +23,25 @@ try:
     metadatadir = sys.argv[2]
     assert os.path.isdir(metadatadir)
 except:
-    print("First argument must be metadata directory (../metadata)")
+    print("Second argument must be metadata directory (../metadata)")
     exit(1)
 
-store = stam.AnnotationStore(id="hooft_bron")
-store.set_filename("hooft_bron.store.stam.json")
+try:
+    storefile = sys.argv[3]
+except:
+    print("Third argument must be store file (hooft_bron.store.stam.json). Either a new one to generate (pre-transposition) or an existing one to enrich (post-transposition)")
+    exit(1)
 
-for filename in glob(os.path.join(sourcedir,"*.txt")):
-    store.add_resource(filename)
+if os.path.exists(storefile):
+    mode = Mode.POST
+    store = stam.AnnotationStore(file=storefile)
+else:
+    mode = Mode.PRE
+    store = stam.AnnotationStore(id="hooft_bron")
+    store.set_filename(storefile)
+
+    for filename in glob(os.path.join(sourcedir,"*.txt")):
+        store.add_resource(filename)
 
 correspondents = {}
 with open(os.path.join(metadatadir,"correspondents.csv")) as csvfile:
@@ -36,11 +53,52 @@ with open(os.path.join(metadatadir,"letters.csv")) as csvfile:
     for row in csv.DictReader(csvfile):
         letters[row['id']] = row
 
+letters_mapped = defaultdict(dict)
+if mode == Mode.POST:
+    begin = None
+    end = None
+
+    for transposition in store.annotations(set="https://w3id.org/stam/extensions/stam-transpose/", key="Transposition"):
+        targetside, sourceside = transposition.annotations_in_targets()
+        sourceresource_id = sourceside.resources()[0].id()
+        targetresource_id = targetside.resources()[0].id()
+        assert sourceresource_id is not None
+        assert targetresource_id is not None
+        if sourceresource_id.startswith("hooft_bron/") and targetresource_id in ("hoof001hwva02.txt","hoof001hwva03.txt","hoof001hwva04.txt"):
+            dbnl_id = sourceresource_id[len("hooft_bron/"):-4]
+
+            begin = letters_mapped[dbnl_id].get(begin)
+            end = letters_mapped[dbnl_id].get(end)
+            for textselection in targetside.textselections():
+                if begin is None:
+                    begin = textselection.begin()
+                else:
+                    begin = min(textselection.begin(),begin)
+                if end is None:
+                    end = textselection.end()
+                else:
+                    end = max(textselection.end(),end)
+
+            if begin and end:
+                print(dbnl_id,"->", f"{targetresource_id}#{begin}-{end}", file=sys.stderr)
+                letters_mapped[dbnl_id]['begin'] = begin
+                letters_mapped[dbnl_id]['end'] = end
+                letters_mapped[dbnl_id]['resource_id'] = targetresource_id
+
 with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
     for row in csv.DictReader(csvfile):
-        dbnl_id = f"hooft_bron/{row['dbnl_id']}.txt"
-        resource = store.resource(dbnl_id)
-        target = stam.Selector.resourceselector(resource)
+        letter_filename = f"hooft_bron/{row['dbnl_id']}.txt"
+        if mode == Mode.PRE:
+            resource = store.resource(letter_filename)
+            target = stam.Selector.resourceselector(resource)
+        elif mode == Mode.POST:
+            resource = store.resource(letters_mapped[row['dbnl_id']]['resource_id'])
+            begin = letters_mapped[row['dbnl_id']]['begin']
+            end = letters_mapped[row['dbnl_id']]['end']
+            target = stam.Selector.textselector(resource, stam.Offset.simple(begin,end) )
+        else:
+            raise Exception("Invalid mode")
+
         store.annotate(target, {
             "set": "brieven-van-hooft-categories",
             "key": "type",
@@ -61,11 +119,15 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
             "key": "topic",
             "value": row['topic']
         })
-        target = stam.Selector.textselector(resource, stam.Offset.whole())
         store.annotate(target, {
             "set": "brieven-van-hooft-metadata",
             "key": "dbnl_id",
-            "value": dbnl_id
+            "value": row['dbnl_id']
+        })
+        store.annotate(target, {
+            "set": "brieven-van-hooft-metadata",
+            "key": "letter_id",
+            "value": row['id']
         })
         store.annotate(target, {
             "set": "brieven-van-hooft-metadata",
@@ -148,43 +210,44 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
                 )
             store.annotate(target, data)
 
-        if row['greeting_start'] != "" and row['greeting_end'] != "":
-            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['greeting_start']), int(row['greeting_end'])))
-            store.annotate(target, {
-                "set": "brieven-van-hooft-categories",
-                "key": "part",
-                "value": "greeting"
-            })
-        if row['opening_start'] != "" and row['opening_end'] != "":
-            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['opening_start']), int(row['opening_end'])))
-            store.annotate(target, {
-                "set": "brieven-van-hooft-categories",
-                "key": "part",
-                "value": "opening"
-            })
-        if row['narratio_start'] != "" and row['narratio_end'] != "":
-            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['narratio_start']), int(row['narratio_end'])))
-            store.annotate(target, {
-                "set": "brieven-van-hooft-categories",
-                "key": "part",
-                "value": "narratio"
-            })
-        if row['closing_start'] != "" and row['closing_end'] != "":
-            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['closing_start']), int(row['closing_end'])))
-            store.annotate(target, {
-                "set": "brieven-van-hooft-categories",
-                "key": "part",
-                "value": "closing"
-            })
-        if row['finalgreeting_start'] != "" and row['finalgreeting_end'] != "":
-            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['finalgreeting_start']), int(row['finalgreeting_end'])))
-            try:
+        if mode == Mode.PRE:
+            if row['greeting_start'] != "" and row['greeting_end'] != "":
+                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['greeting_start']), int(row['greeting_end'])))
                 store.annotate(target, {
                     "set": "brieven-van-hooft-categories",
                     "key": "part",
-                    "value": "finalgreeting"
+                    "value": "greeting"
                 })
-            except Exception as err:
-                print(f"WARNING: Finalgreeting cursor out of bounds: {err}", file=sys.stderr)
+            if row['opening_start'] != "" and row['opening_end'] != "":
+                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['opening_start']), int(row['opening_end'])))
+                store.annotate(target, {
+                    "set": "brieven-van-hooft-categories",
+                    "key": "part",
+                    "value": "opening"
+                })
+            if row['narratio_start'] != "" and row['narratio_end'] != "":
+                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['narratio_start']), int(row['narratio_end'])))
+                store.annotate(target, {
+                    "set": "brieven-van-hooft-categories",
+                    "key": "part",
+                    "value": "narratio"
+                })
+            if row['closing_start'] != "" and row['closing_end'] != "":
+                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['closing_start']), int(row['closing_end'])))
+                store.annotate(target, {
+                    "set": "brieven-van-hooft-categories",
+                    "key": "part",
+                    "value": "closing"
+                })
+            if row['finalgreeting_start'] != "" and row['finalgreeting_end'] != "":
+                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['finalgreeting_start']), int(row['finalgreeting_end'])))
+                try:
+                    store.annotate(target, {
+                        "set": "brieven-van-hooft-categories",
+                        "key": "part",
+                        "value": "finalgreeting"
+                    })
+                except Exception as err:
+                    print(f"WARNING: Finalgreeting cursor out of bounds: {err}", file=sys.stderr)
 
 store.save()
