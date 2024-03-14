@@ -80,7 +80,7 @@ hoof001hwva.fromfolia.store.stam.json: $(folia_fixed)
 	mv hoof001hwva.store.stam.json $@
 
 hoof001hwva.align.stam.batch: hoof001hwva.fromfolia.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-	for FILE in ${sourcetexts_2_noext}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
+	for FILE in ${sourcetexts_2_noext}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" > $@; done
 	for FILE in ${sourcetexts_3_noext}; do echo "align --trim --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
 	for FILE in ${sourcetexts_4_noext}; do echo "align --trim --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
 
@@ -94,7 +94,7 @@ transpositions.tsv: hoof001hwva.aligned.store.stam.json
 	stam export --alignments $< | cut -f 1,2,4 | sort -k3 | uniq > $@
 
 transpose.stam.batch: transpositions.tsv
-	cat $< | awk '{ print "transpose --transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' >> $@
+	cat $< | awk '{ print "transpose --ignore-errors --transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' > $@
 
 hoof001hwva.transposed.store.stam.json: hoof001hwva.aligned.store.stam.json transpose.stam.batch
 	@echo "--- Transposing annotations ---">&2
@@ -108,7 +108,7 @@ hooft_bron.store.stam.json:
 	python ../scripts/metadata2stam.py hooft_bron metadata
 
 hooft_bron_align.stam.batch: hooft_bron.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-	for FILE in ${metadata_sourcetexts_2}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" >> $@; done
+	for FILE in ${metadata_sourcetexts_2}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" > $@; done
 	for FILE in ${metadata_sourcetexts_3}; do echo "align --trim --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
 	for FILE in ${metadata_sourcetexts_4}; do echo "align --trim --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
 
@@ -119,7 +119,7 @@ hooft_bron_aligned.store.stam.json: hooft_bron.store.stam.json hooft_bron_align.
 	cat hooft_bron_align.stam.batch | stam batch $@
 
 hooft_bron_transpose.stam.batch: hooft_bron_transpositions.tsv
-	cat $< | awk '{ print "transpose --transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' >> $@
+	cat $< | awk '{ print "transpose --ignore-errors --transposition "$$1" --query \"SELECT ANNOTATION WHERE RESOURCE "$$3";\"" }' >> $@
 
 hooft_bron_transpositions.tsv: hooft_bron_aligned.store.stam.json
 	stam export --alignments $< | cut -f 1,2,4 | sort -k3 | uniq > $@
