@@ -4,6 +4,7 @@ import sys
 import json
 import os.path
 import argparse
+from copy import deepcopy
 
 from textrepo.client import TextRepoClient
 from annorepo.client import AnnoRepoClient
@@ -34,7 +35,7 @@ if __name__ == "__main__":
         trclient.create_file_type(name=filetype, mimetype="application/json")
 
     for textfile in args.textresources:
-        external_id = os.path.basename(textfile)
+        external_id = os.path.basename(textfile).replace('.txt','')
 
         #encapsulate the plain text format in the JSON format TextRepo expects  _ordered_segments (with only one huge segment containing the whole edition)
         with open(textfile,'r',encoding='utf-8') as f:
@@ -61,23 +62,62 @@ if __name__ == "__main__":
         for line in f:
             webannotation = json.loads(line)
 
-            #substitute old target resource for new URI in textrepo
+            #copy old target resource to one with new URI in textrepo
             if 'source' in webannotation['target']:
-                filename = webannotation['target']['source'].replace("urn:brievenvanhooft:resource/","") #strip old prefix
-                if filename not in resource2urimap:
-                    print(f"[error] File '{filename}' is not a known target, must be one of the text resources passed",file=sys.stderr)
+                external_id = webannotation['target']['source'].replace("https://www.dbnl.org/nieuws/text.php?id=","") #strip old prefix
+                if external_id not in resource2urimap:
+                    print(f"[error] File '{external_id}' is not a known target, must be one of the text resources passed",file=sys.stderr)
                     sys.exit(1)
-                uri = resource2urimap[filename]
-                webannotation['target']['source'] = uri
+                uri = resource2urimap[external_id]
+                textrepo_copy = deepcopy(webannotation['target'])
+                textrepo_copy['source'] = uri
+                textrepo_copy['type'] = "Text"
+                begin = textrepo_copy['selector']['start']
+                end = textrepo_copy['selector']['end'] - 1, #inclusive end (W3C Anno is exclusive, so -1)
+                textrepo_copy['selector'] = {
+                    "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
+                    "type": "TextAnchorSelector",
+                    "start": 0, #segment
+                    "end": 0, #segment inclusive-end
+                    "charStart": begin,
+                    "charEnd": end,                }
+                webannotation['target'] = [ webannotation['target'], textrepo_copy, {
+                    "source": f"{uri}/segments/index/0/{begin}/0/{end}",
+                    "type": "Text"
+                }]
             elif 'items' in webannotation['target']: #target may be composite:
+                textrepo_copy = deepcopy(webannotation['target'])
+                textrepo_copy['items'] = []
+                textrepo_copy2= deepcopy(webannotation['target'])
+                textrepo_copy2['items'] = []
                 for item in webannotation['target']['items']:
                     if 'source' in item:
-                        filename = item['source'].replace("urn:brievenvanhooft:resource/","") #strip old prefix
-                        if filename not in resource2urimap:
-                            print(f"[error] File '{filename}' is not a known target, must be one of the text resources passed",file=sys.stderr)
+                        external_id = webannotation['target']['source'].replace("https://www.dbnl.org/nieuws/text.php?id=","") #strip old prefix
+                        if external_id not in resource2urimap:
+                            print(f"[error] File '{external_id}' is not a known target, must be one of the text resources passed",file=sys.stderr)
                             sys.exit(1)
-                        uri = resource2urimap[filename]
-                        item['source'] = uri
+                        uri = resource2urimap[external_id]
+                        item_copy = deepcopy(item)
+                        item_copy['source'] = uri
+                        item_copy['type'] = "Text"
+                        begin = item_copy['selector']['start']
+                        end = item_copy['selector']['end'] - 1, #inclusive end (W3C Anno is exclusive, so -1)
+                        item_copy['selector'] = {
+                            "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
+                            "type": "TextAnchorSelector",
+                            "start": 0, #segment
+                            "end": 0, #segment inclusive-end
+                            "charStart": begin,
+                            "charEnd": end,
+                        }
+                        textrepo_copy['items'].append(item_copy)
+                        textrepo_copy2['items'].append(
+                            {
+                                "source": f"{uri}/segments/index/0/{begin}/0/{end}",
+                                "type": "Text"
+                            }
+                        )
+                webannotation['target'] = [ webannotation['target'], textrepo_copy, textrepo_copy2 ]
 
             if len(chunk) >= CHUNK_SIZE:
                 chunks.append(chunk)
