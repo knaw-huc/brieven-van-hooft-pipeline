@@ -1,5 +1,5 @@
 .SHELLFLAGS = -o pipefail -c
-.PHONY: clean list all validation stam folia.html sourcetexts upload flush flushtextrepo flushannorepo
+.PHONY: clean list all validation stam folia.html upload flush flushtextrepo flushannorepo
 .DELETE_ON_ERROR:
 
 folia_merged := $(wildcard *.merged.xml)
@@ -7,23 +7,10 @@ folia_fixed := $(folia_merged:%.merged.xml=%.fixed.xml)
 folia_validation := $(folia_merged:%.merged.xml=%.validation)
 folia_html := $(folia_merged:%.merged.xml=%.folia.html)
 
-#there are three editions from DBNL
-sourcetexts_2 := $(wildcard hoof001hwva02_01_*.txt)
-sourcetexts_3 := $(wildcard hoof001hwva03_01_*.txt)
-sourcetexts_4 := $(wildcard hoof001hwva04_01_*.txt)
-sourcetexts_2_noext := $(sourcetexts_2:%.txt=%)
-sourcetexts_3_noext := $(sourcetexts_3:%.txt=%)
-sourcetexts_4_noext := $(sourcetexts_4:%.txt=%)
-metadata_sourcetexts_2 := $(wildcard hooft_bron/hoof001hwva02_01_*.txt)
-metadata_sourcetexts_3 := $(wildcard hooft_bron/hoof001hwva03_01_*.txt)
-metadata_sourcetexts_4 := $(wildcard hooft_bron/hoof001hwva04_01_*.txt)
-
-
 all: $(folia_fixed) $(folia_validation) stam
 
-
 clean: cleanstam
-	-rm alignments.lst
+	-rm *.lst
 	-rm hoof*.fixed.xml
 	-rm hoof*.validation
 	-rm hoof*.folia.html
@@ -53,8 +40,6 @@ validation: $(folia_validation)
 	if ! ../scripts/fixfolia.py "$<" > "$@" 2> err; then cat err; false; fi
 	cat err >> alignments.lst
 
-sourcetexts: hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-
 hoof001hwva02.txt:
 	curl https://www.dbnl.org/nieuws/text.php\?id\=hoof001hwva02 > $@
 
@@ -81,10 +66,14 @@ hoof001hwva.fromfolia.store.stam.json: $(folia_fixed)
 	folia2stam --id hoof001hwva -X $^
 	mv hoof001hwva.store.stam.json $@
 
-hoof001hwva.align.stam.batch: hoof001hwva.fromfolia.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-	for FILE in ${sourcetexts_2_noext}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" > $@; done
-	for FILE in ${sourcetexts_3_noext}; do echo "align --trim --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
-	for FILE in ${sourcetexts_4_noext}; do echo "align --trim --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
+hoof001hwva.align.stam.batch: sourcetexts.noextension.lst:
+	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,1,13)".txt --resource $$1" }' > $@
+
+sourcetexts.lst: $(folia_fixed)
+	ls hoof001hwva0?_01_*.txt > $@
+
+sourcetexts.noextension.lst: sourcetexts.lst
+	sed 's/.txt//g' < $< > $@ 
 
 hoof001hwva.aligned.store.stam.json: hoof001hwva.fromfolia.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt hoof001hwva.align.stam.batch
 	@echo "--- Adding source texts ---">&2
@@ -112,10 +101,11 @@ hooft_bron.store.stam.json:
 	-rm $@
 	python ../scripts/metadata2stam.py hooft_bron metadata $@  #non-existing file, will be created
 
-hooft_bron_align.stam.batch: hooft_bron.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
-	for FILE in ${metadata_sourcetexts_2}; do echo "align --trim --verbose --resource hoof001hwva02.txt --resource $$FILE" > $@; done
-	for FILE in ${metadata_sourcetexts_3}; do echo "align --trim --verbose --resource hoof001hwva03.txt --resource $$FILE" >> $@; done
-	for FILE in ${metadata_sourcetexts_4}; do echo "align --trim --verbose --resource hoof001hwva04.txt --resource $$FILE" >> $@; done
+hooft_bron.lst:
+	ls hooft_bron/hoof001hwva0?_01_*.txt > $@
+
+hooft_bron_align.stam.batch: hooft_bron.lst
+	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,1,13)".txt --resource $$1" }' > $@
 
 hooft_bron_aligned.store.stam.json: hooft_bron.store.stam.json hooft_bron_align.stam.batch
 	@echo "--- Adding source texts ---">&2
