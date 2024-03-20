@@ -92,10 +92,14 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
             resource = store.resource(letter_filename)
             target = stam.Selector.resourceselector(resource)
         elif mode == Mode.POST:
-            resource = store.resource(letters_mapped[row['dbnl_id']]['resource_id'])
-            begin = letters_mapped[row['dbnl_id']]['begin']
-            end = letters_mapped[row['dbnl_id']]['end']
-            target = stam.Selector.textselector(resource, stam.Offset.simple(begin,end) )
+            if 'resource_id' in letters_mapped[row['dbnl_id']]:
+                resource = store.resource(letters_mapped[row['dbnl_id']]['resource_id'])
+                begin = letters_mapped[row['dbnl_id']]['begin']
+                end = letters_mapped[row['dbnl_id']]['end']
+                target = stam.Selector.textselector(resource, stam.Offset.simple(begin,end) )
+            else:
+                print(f"WARNING: No resource found for {row['dbnl_id']} ..skipping!", file=sys.stderr)
+                continue
         else:
             raise Exception("Invalid mode")
 
