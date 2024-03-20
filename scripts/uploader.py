@@ -26,7 +26,7 @@ if __name__ == "__main__":
     resource2urimap = {}
 
     trclient = TextRepoClient(args.textrepo_url, verbose=False, api_key=args.textrepo_key)
-    arclient = AnnoRepoClient(args.annorepo_url, verbose=True,api_key=args.annorepo_key)
+    arclient = AnnoRepoClient(args.annorepo_url, verbose=False,api_key=args.annorepo_key)
     AR_CONTAINER_URI = f"{args.annorepo_url}/w3c/{PROJECT_ID}"
 
     #create file type
@@ -93,7 +93,7 @@ if __name__ == "__main__":
                 textrepo_copy2['items'] = []
                 for item in webannotation['target']['items']:
                     if 'source' in item:
-                        external_id = webannotation['target']['source'].replace("https://www.dbnl.org/nieuws/text.php?id=","") #strip old prefix
+                        external_id = item['source'].replace("https://www.dbnl.org/nieuws/text.php?id=","") #strip old prefix
                         if external_id not in resource2urimap:
                             print(f"[error] File '{external_id}' is not a known target, must be one of the text resources passed",file=sys.stderr)
                             sys.exit(1)
@@ -102,7 +102,7 @@ if __name__ == "__main__":
                         item_copy['source'] = uri
                         item_copy['type'] = "Text"
                         begin = item_copy['selector']['start']
-                        end = item_copy['selector']['end'] - 1, #inclusive end (W3C Anno is exclusive, so -1)
+                        end = item_copy['selector']['end'] - 1 #inclusive end (W3C Anno is exclusive, so -1)
                         item_copy['selector'] = {
                             "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
                             "type": "TextAnchorSelector",
@@ -126,6 +126,7 @@ if __name__ == "__main__":
             chunk.append(webannotation)
             if args.verbose:
                 json.dump(webannotation, sys.stdout)
+                sys.stdout.write("\n")
             count += 1
 
     print(f"Processed {count} annotations", file=sys.stderr)
