@@ -82,8 +82,9 @@ if __name__ == "__main__":
                     "end": 0, #segment inclusive-end
                     "charStart": begin,
                     "charEnd": end,                }
+                view_uri = uri.replace('/rest/','/view/')
                 webannotation['target'] = [ webannotation['target'], textrepo_copy, {
-                    "source": f"{uri}/segments/index/0/{begin}/0/{end}",
+                    "source": f"{view_uri}/segments/index/0/{begin}/0/{end}",
                     "type": "Text"
                 }]
             elif 'items' in webannotation['target']: #target may be composite:
@@ -112,9 +113,10 @@ if __name__ == "__main__":
                             "charEnd": end,
                         }
                         textrepo_copy['items'].append(item_copy)
+                        view_uri = uri.replace('/rest/','/view/')
                         textrepo_copy2['items'].append(
                             {
-                                "source": f"{uri}/segments/index/0/{begin}/0/{end}",
+                                "source": f"{view_uri}/segments/index/0/{begin}/0/{end}",
                                 "type": "Text"
                             }
                         )
