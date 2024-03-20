@@ -53,6 +53,7 @@ if __name__ == "__main__":
     if not arclient.has_container(PROJECT_ID):
         print(f"Creating container for AnnoRepo...", file=sys.stderr)
         arclient.create_container(name=PROJECT_ID, label="Brieven van Hooft")
+    arclient.set_anonymous_user_read_access(container_name=PROJECT_ID, has_read_access=True)
 
     chunks = []
     chunk = []
