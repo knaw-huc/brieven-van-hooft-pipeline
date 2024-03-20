@@ -50,9 +50,13 @@ if __name__ == "__main__":
         resource2urimap[external_id] = uri
         print(f"  Published as {uri}",file=sys.stderr)
 
-    if not arclient.has_container(PROJECT_ID):
+    if arclient.has_container(PROJECT_ID):
+        print(f"Container already exists, did you intend to delete the existing container and annotations first? (make flush)", file=sys.stderr)
+        sys.exit(2)
+    else:
         print(f"Creating container for AnnoRepo...", file=sys.stderr)
         arclient.create_container(name=PROJECT_ID, label="Brieven van Hooft")
+
     arclient.set_anonymous_user_read_access(container_name=PROJECT_ID, has_read_access=True)
 
     chunks = []
