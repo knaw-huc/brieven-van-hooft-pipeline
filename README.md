@@ -173,3 +173,198 @@ flowchart TD
     class textrepo,annorepo,textannoviz,broccoli service
     class folia_input,folia_fixed,stamstore,stamstore2,stamstorefinal,foliaplaintext,dbnlplaintext,webanno,foliahtml,stamhtml,derivedplaintext,metadatacsv data
 ```
+
+## Output vocabulary
+
+### Web Annotations
+
+The web annotations that are uploaded to AnnoRepo look like:
+
+```json
+{
+  "@context": [
+    "http://www.w3.org/ns/anno.jsonld",
+    {
+      "folia": "https://w3id.org/folia/v2/",
+      "pos": "urn:brievenvanhooft:dataset/gustave-pos/"
+    }
+  ],
+  "id": "urn:brievenvanhooft:annotation/4p4LiD7AwAehuqFMxA9RM-transposed",
+  "type": "Annotation",
+  "generated": "2024-03-20T15:44:58.908636560+01:00",
+  "generator": {
+    "id": "https://github.com/annotation/stam-rust",
+    "type": "Software",
+    "name": "STAM Library"
+  },
+  "body": {
+    "type": "Dataset",
+    "id": "urn:brievenvanhooft:annotation/4p4LiD7AwAehuqFMxA9RM-transposed/body",
+    "folia:elementtype": "pos",
+    "folia:annotationtype": "pos",
+    "pos:class": "TW(hoofd)",
+    "folia:confidence": 0,
+    "pos:head": "TW",
+    "pos:numtype": "hoofd"
+  },
+  "target": [
+    {
+      "source": "https://www.dbnl.org/nieuws/text.php?id=hoof001hwva02",
+      "selector": {
+        "type": "TextPositionSelector",
+        "start": 1627327,
+        "end": 1627330
+      }
+    },
+    {
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/47858867-a96a-4d3d-8809-a7f8d33496bb",
+      "selector": {
+        "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
+        "type": "TextAnchorSelector",
+        "start": 0,
+        "end": 0,
+        "charStart": 1627327,
+        "charEnd": 1627329
+      },
+      "type": "Text"
+    },
+    {
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/47858867-a96a-4d3d-8809-a7f8d33496bb/segments/index/0/1627327/0/1627329",
+      "type": "Text"
+    }
+  ]
+}
+```
+
+The context defines the following prefixes:
+
+* ``folia: https://w3id.org/folia/v2/`` - Contains vocabulary predefined by FoLiA, such as linguistic annotation types, structural annotation types, and others. The ontology is defined here: <https://github.com/proycon/folia/blob/master/schemas/folia.ttl> .
+Not all FoLiA annotations have been propagated to the Web Annotation output, to keep things more manageable.
+* ``pos: urn:brievenvanhooft:dataset/gustave-pos/`` - Part-of-Speech tags as annotated (semi-automatically with curation) in the 2017 project.
+    * The full part-of-speech tag can always be found in the `pos:class` property.
+* ``lem: urn:brievenvanhooft:dataset/gustave-lem/`` - Lemma as annotated (semi-automatically with curation) in the 2017 project.
+    * The lemma can be found in the `lem:class` property.
+
+
+High-level metadata (the sociolinguistic annotations that were kept in CSV
+files) is grouped into one annotation as much as possible, this is the tier1
+level:
+
+```json
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "id": "urn:brievenvanhooft:annotation/hoof001hwva03_01_0255",
+  "type": "Annotation",
+  "generated": "2024-03-20T15:46:39.658827052+01:00",
+  "generator": {
+    "id": "https://github.com/annotation/stam-rust",
+    "type": "Software",
+    "name": "STAM Library"
+  },
+  "body": {
+    "id": "d7127675953d73de3c81f1aea13d1583",
+    "type": "Letter",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/dbnl_id": "hoof001hwva03_01_0255",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-categories/type": "private",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-categories/dependency": "independent",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-categories/function": "raad",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-categories/topic": "overlijden",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/letter_id": "621",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/dated": "21-4-1634",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/correspondent_id": "114",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/recipient": "Baek",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/function": "Zwager van Hooft",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/invidividual": 1,
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/literary": 0,
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/gender": "male",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/birthyear": 1596,
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/deathyear": 1681,
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/birthyear_unclear": 1,
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/deathyear_unclear": 1
+  },
+  "target": [
+    {
+      "source": "https://www.dbnl.org/nieuws/text.php?id=hoof001hwva03",
+      "selector": {
+        "type": "TextPositionSelector",
+        "start": 972104,
+        "end": 972120
+      }
+    },
+    {
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/322d77d5-2920-437c-a819-d424ce8ec4bf",
+      "selector": {
+        "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
+        "type": "TextAnchorSelector",
+        "start": 0,
+        "end": 0,
+        "charStart": 972104,
+        "charEnd": 972119
+      },
+      "type": "Text"
+    },
+    {
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/322d77d5-2920-437c-a819-d424ce8ec4bf/segments/index/0/972104/0/972119",
+      "type": "Text"
+    }
+  ]
+}
+```
+
+The metadata, originally from CSV files and documented [here](https://github.com/knaw-huc/brieven-van-hooft-pipeline/blob/main/data/metadata/README), is:
+
+* `urn:brievenvanhooft:metadata/brieven-van-hooft-categories/type`: `private` or `business` , for private/personal correspondence vs business correspondence
+* `urn:brievenvanhooft:metadata/brieven-van-hooft-categories/dependency`: `accompanying` or `independent`, 
+* `urn:brievenvanhooft:metadata/brieven-van-hooft-categories/dbnl_id`: ID as known at DBNL
+* `urn:brievenvanhooft:metadata/brieven-van-hooft-categories/letter_id`: Letter sequential ID (not always strictly numeric)
+* For the remainder of the metadata properties, see [here](https://github.com/knaw-huc/brieven-van-hooft-pipeline/blob/main/data/metadata/README). Note that not all properties are always present!
+
+This is the tier0 level:
+
+```json
+{
+  "@context": "http://www.w3.org/ns/anno.jsonld",
+  "id": "urn:brievenvanhooft:annotation/hoof001hwva02",
+  "type": "Annotation",
+  "generated": "2024-03-20T15:46:39.653189199+01:00",
+  "generator": {
+    "id": "https://github.com/annotation/stam-rust",
+    "type": "Software",
+    "name": "STAM Library"
+  },
+  "body": {
+    "id": "7404ee9df3ec93b396baf5c83f457c29",
+    "type": "File",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/dbnl_id": "hoof001hwva02",
+    "urn:brievenvanhooft:metadata/brieven-van-hooft-metadata/volume": "1"
+  },
+  "target": [
+    {
+      "source": "https://www.dbnl.org/nieuws/text.php?id=hoof001hwva02",
+      "selector": {
+        "type": "TextPositionSelector",
+        "start": 0,
+        "end": 1873371
+      }
+    },
+    {
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/47858867-a96a-4d3d-8809-a7f8d33496bb",
+      "selector": {
+        "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
+        "type": "TextAnchorSelector",
+        "start": 0,
+        "end": 0,
+        "charStart": 0,
+        "charEnd": 1873370
+      },
+      "type": "Text"
+    },
+    {
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/47858867-a96a-4d3d-8809-a7f8d33496bb/segments/index/0/0/0/1873370",
+      "type": "Text"
+    }
+  ]
+}
+```
+
+
