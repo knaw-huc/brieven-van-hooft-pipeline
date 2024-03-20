@@ -19,6 +19,7 @@ if __name__ == "__main__":
     parser.add_argument('--annorepo-url', help="URL to the annorepo instance", type=str, action="store", required=True, default="https://brieven-van-hooft.annorepo.dev.clariah.nl/") 
     parser.add_argument('--annorepo-key', help="API key for annorepo", type=str, action="store", required=True) 
     parser.add_argument('--webannotations','-a', help="Filename to a JSON List of all web annotations", type=str, action="store", required=True) 
+    parser.add_argument('--verbose','-v', help="Output updated webannotations to stdout", action="store_true")
 
     args = parser.parse_args()
 
@@ -123,6 +124,8 @@ if __name__ == "__main__":
                 chunks.append(chunk)
                 chunk = []
             chunk.append(webannotation)
+            if args.verbose:
+                json.dump(webannotation, sys.stdout)
             count += 1
 
     print(f"Processed {count} annotations", file=sys.stderr)

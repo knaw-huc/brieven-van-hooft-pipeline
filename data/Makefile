@@ -131,8 +131,8 @@ webannotations: hoof001hwva.jsonl
 
 hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	@echo "--- Web Annotation export ---">&2
-	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "pos: urn:brievenvanhooft:dataset/gustave-pos/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "pos" --query 'SELECT ANNOTATION ?pos WHERE DATA "gustave-pos" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=(hoof001hwva0[234]).txt/id=\1/g' > $@
-	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "lem: urn:brievenvanhooft:dataset/gustave-lem/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "lem" --query 'SELECT ANNOTATION ?lem WHERE DATA "gustave-lem" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=(hoof001hwva0[234]).txt/id=\1/g' >> $@
+	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "pos: urn:brievenvanhooft:dataset/gustave-pos/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "pos" --query 'SELECT ANNOTATION ?pos WHERE DATA "gustave-pos" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=\/(hoof001hwva0[234]).txt/id=\1/g' > $@
+	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "lem: urn:brievenvanhooft:dataset/gustave-lem/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "lem" --query 'SELECT ANNOTATION ?lem WHERE DATA "gustave-lem" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=\/(hoof001hwva0[234]).txt/id=\1/g' >> $@
 
 upload: hoof001hwva.jsonl hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
 	@echo "--- Upload data into TextRepo & AnnoRepo ---">&2
@@ -148,7 +148,7 @@ endif
 ifeq ($(ANNOREPO_KEY),)
 		$(error ANNOREPO_KEY not set)
 endif
-	../scripts/uploader.py --textrepo-url $(TEXTREPO_URL) --textrepo-key $(TEXTREPO_KEY) --annorepo-url $(ANNOREPO_URL) --annorepo-key $(ANNOREPO_KEY) --webannotations $< hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
+	../scripts/uploader.py --verbose --textrepo-url $(TEXTREPO_URL) --textrepo-key $(TEXTREPO_KEY) --annorepo-url $(ANNOREPO_URL) --annorepo-key $(ANNOREPO_KEY) --webannotations $< hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt > hoof001hwva.uploaded.jsonl
 
 flushannorepo:
 	@echo "--- Flush remote database for AnnoRepo ---">&2
