@@ -12,6 +12,8 @@ class Mode(Enum):
     PRE = 0 #pre-transposition/alignment, will create a new annotation store from scratch
     POST = 1 #post-transposition/alignment, will enrich an existing annotation store
 
+EDITIONS = ("hoof001hwva02.txt","hoof001hwva03.txt","hoof001hwva04.txt")
+
 try:
     sourcedir = sys.argv[1]
     assert os.path.isdir(sourcedir)
@@ -64,7 +66,7 @@ if mode == Mode.POST:
         targetresource_id = targetside.resources()[0].id()
         assert sourceresource_id is not None
         assert targetresource_id is not None
-        if sourceresource_id.startswith("hooft_bron/") and targetresource_id in ("hoof001hwva02.txt","hoof001hwva03.txt","hoof001hwva04.txt"):
+        if sourceresource_id.startswith("hooft_bron/") and targetresource_id in EDITIONS:
             dbnl_id = sourceresource_id[len("hooft_bron/"):-4]
 
             begin = letters_mapped[dbnl_id].get(begin)
@@ -85,25 +87,70 @@ if mode == Mode.POST:
                 letters_mapped[dbnl_id]['end'] = end
                 letters_mapped[dbnl_id]['resource_id'] = targetresource_id
 
+if mode == Mode.POST:
+    #tier0 annotations are required for Broccoli/Brinta/TAV
+    for i, edition in enumerate(EDITIONS):
+        resource = store.resource(edition)
+        target = stam.Selector.textselector(resource, stam.Offset.whole())
+        dbnl_id = edition.replace(".txt","")
+        store.annotate(target, [
+            {
+                "set": "http://www.w3.org/ns/anno/",
+                "key": "type",
+                "value": "File"
+            },
+            {
+                "set": "brieven-van-hooft-metadata",
+                "key": "dbnl_id",
+                "value": f"{dbnl_id}"
+            },
+            {
+                "set": "brieven-van-hooft-metadata",
+                "key": "volume",
+                "value": f"{i+1}"
+            }
+        ], id=dbnl_id)
+
+
+categories = {}
 with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
     for row in csv.DictReader(csvfile):
-        letter_filename = f"hooft_bron/{row['dbnl_id']}.txt"
-        if mode == Mode.PRE:
-            resource = store.resource(letter_filename)
-            target = stam.Selector.resourceselector(resource)
-        elif mode == Mode.POST:
-            if 'resource_id' in letters_mapped[row['dbnl_id']]:
-                resource = store.resource(letters_mapped[row['dbnl_id']]['resource_id'])
-                begin = letters_mapped[row['dbnl_id']]['begin']
-                end = letters_mapped[row['dbnl_id']]['end']
-                target = stam.Selector.textselector(resource, stam.Offset.simple(begin,end) )
-            else:
-                print(f"WARNING: No resource found for {row['dbnl_id']} ..skipping!", file=sys.stderr)
-                continue
-        else:
-            raise Exception("Invalid mode")
+        categories[row['dbnl_id']] = row
 
-        data = [
+dbnl_ids = set(categories.keys()) | set(letters_mapped.keys())
+
+for dbnl_id in dbnl_ids:
+    letter_filename = f"hooft_bron/{dbnl_id}.txt"
+    if mode == Mode.PRE:
+        resource = store.resource(letter_filename)
+        target = stam.Selector.resourceselector(resource)
+    elif mode == Mode.POST:
+        if 'resource_id' in letters_mapped[dbnl_id]:
+            resource = store.resource(letters_mapped[dbnl_id]['resource_id'])
+            begin = letters_mapped[dbnl_id]['begin']
+            end = letters_mapped[dbnl_id]['end']
+            target = stam.Selector.textselector(resource, stam.Offset.simple(begin,end) )
+        else:
+            print(f"WARNING: No resource found for {dbnl_id} ..skipping!", file=sys.stderr)
+            continue
+    else:
+        raise Exception("Invalid mode")
+
+    data = [
+        {
+            "set": "http://www.w3.org/ns/anno/",
+            "key": "type",
+            "value": "Letter"
+        },
+        {
+            "set": "brieven-van-hooft-metadata",
+            "key": "dbnl_id",
+            "value": dbnl_id
+        }
+    ]
+    if dbnl_id in categories:
+        row = categories[dbnl_id]
+        data += [
             {
                 "set": "brieven-van-hooft-categories",
                 "key": "type",
@@ -126,11 +173,6 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
             },
             {
                 "set": "brieven-van-hooft-metadata",
-                "key": "dbnl_id",
-                "value": row['dbnl_id']
-            },
-            {
-                "set": "brieven-van-hooft-metadata",
                 "key": "letter_id",
                 "value": row['id']
             },
@@ -144,7 +186,7 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
         if correspondent_id not in correspondents:
             print(f"WARNING: Correspondent ID {correspondent_id} was not defined.. Skipping", file=sys.stderr)
         else:
-            data = [
+            data += [
                 {
                     "set": "brieven-van-hooft-metadata",
                     "key": "correspondent_id",
@@ -215,51 +257,52 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
                     }
                 )
         
-        kwargs = {}
-        if mode == Mode.POST:
-            kwargs['id'] = row['dbnl_id'] #use DBNL ID as annotation ID in final result
+    kwargs = {}
+    if mode == Mode.POST:
+        kwargs['id'] = dbnl_id
 
-        store.annotate(target, data, **kwargs)
+    store.annotate(target, data, **kwargs)
 
+    if mode == Mode.PRE and dbnl_id in categories:
+        row = categories[dbnl_id]
+        if row['greeting_start'] != "" and row['greeting_end'] != "":
+            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['greeting_start']), int(row['greeting_end'])))
+            store.annotate(target, {
+                "set": "brieven-van-hooft-categories",
+                "key": "part",
+                "value": "greeting"
+            })
+        if row['opening_start'] != "" and row['opening_end'] != "":
+            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['opening_start']), int(row['opening_end'])))
+            store.annotate(target, {
+                "set": "brieven-van-hooft-categories",
+                "key": "part",
+                "value": "opening"
+            })
+        if row['narratio_start'] != "" and row['narratio_end'] != "":
+            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['narratio_start']), int(row['narratio_end'])))
+            store.annotate(target, {
+                "set": "brieven-van-hooft-categories",
+                "key": "part",
+                "value": "narratio"
+            })
+        if row['closing_start'] != "" and row['closing_end'] != "":
+            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['closing_start']), int(row['closing_end'])))
+            store.annotate(target, {
+                "set": "brieven-van-hooft-categories",
+                "key": "part",
+                "value": "closing"
+            })
+        if row['finalgreeting_start'] != "" and row['finalgreeting_end'] != "":
+            target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['finalgreeting_start']), int(row['finalgreeting_end'])))
+            try:
+                store.annotate(target, {
+                    "set": "brieven-van-hooft-categories",
+                    "key": "part",
+                    "value": "finalgreeting"
+                })
+            except Exception as err:
+                print(f"WARNING: Finalgreeting cursor out of bounds: {err}", file=sys.stderr)
 
-        if mode == Mode.PRE:
-            if row['greeting_start'] != "" and row['greeting_end'] != "":
-                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['greeting_start']), int(row['greeting_end'])))
-                store.annotate(target, {
-                    "set": "brieven-van-hooft-categories",
-                    "key": "part",
-                    "value": "greeting"
-                })
-            if row['opening_start'] != "" and row['opening_end'] != "":
-                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['opening_start']), int(row['opening_end'])))
-                store.annotate(target, {
-                    "set": "brieven-van-hooft-categories",
-                    "key": "part",
-                    "value": "opening"
-                })
-            if row['narratio_start'] != "" and row['narratio_end'] != "":
-                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['narratio_start']), int(row['narratio_end'])))
-                store.annotate(target, {
-                    "set": "brieven-van-hooft-categories",
-                    "key": "part",
-                    "value": "narratio"
-                })
-            if row['closing_start'] != "" and row['closing_end'] != "":
-                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['closing_start']), int(row['closing_end'])))
-                store.annotate(target, {
-                    "set": "brieven-van-hooft-categories",
-                    "key": "part",
-                    "value": "closing"
-                })
-            if row['finalgreeting_start'] != "" and row['finalgreeting_end'] != "":
-                target = stam.Selector.textselector(resource, stam.Offset.simple(int(row['finalgreeting_start']), int(row['finalgreeting_end'])))
-                try:
-                    store.annotate(target, {
-                        "set": "brieven-van-hooft-categories",
-                        "key": "part",
-                        "value": "finalgreeting"
-                    })
-                except Exception as err:
-                    print(f"WARNING: Finalgreeting cursor out of bounds: {err}", file=sys.stderr)
 
 store.save()
