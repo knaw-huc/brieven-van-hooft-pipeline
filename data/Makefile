@@ -1,5 +1,5 @@
 .SHELLFLAGS = -o pipefail -c
-.PHONY: clean list all validation stam folia.html upload flush flushtextrepo flushannorepo
+.PHONY: clean list all validation stam folia.html upload flush flushtextrepo flushannorepo webannotations
 .DELETE_ON_ERROR:
 
 folia_merged := $(wildcard *.merged.xml)
@@ -66,7 +66,7 @@ hoof001hwva.fromfolia.store.stam.json: $(folia_fixed)
 	folia2stam --id hoof001hwva -X $^
 	mv hoof001hwva.store.stam.json $@
 
-hoof001hwva.align.stam.batch: sourcetexts.noextension.lst:
+hoof001hwva.align.stam.batch: sourcetexts.noextension.lst
 	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,1,13)".txt --resource $$1" }' > $@
 
 sourcetexts.lst: $(folia_fixed)
@@ -126,6 +126,8 @@ hooft_bron_transposed.store.stam.json: hooft_bron_aligned.store.stam.json hooft_
 %.edition.html: %.txt hoof001hwva.store.stam.json
 	@echo "--- HTML edition visualisation via STAM ---">&2
 	stam view --query "SELECT RESOURCE ?edition WHERE ID \"$<\";" --query '@VALUETAG SELECT ANNOTATION ?pos WHERE RESOURCE ?edition; DATA "gustave-pos" "class";' --query '@VALUETAG SELECT ANNOTATION ?lemma WHERE RESOURCE ?edition; DATA "gustave-lem" "class";' hoof001hwva.store.stam.json > $@
+
+webannotations: hoof001hwva.jsonl
 
 hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	@echo "--- Web Annotation export ---">&2
