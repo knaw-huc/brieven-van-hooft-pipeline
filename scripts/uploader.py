@@ -74,7 +74,7 @@ if __name__ == "__main__":
                 textrepo_copy['source'] = uri
                 textrepo_copy['type'] = "Text"
                 begin = textrepo_copy['selector']['start']
-                end = textrepo_copy['selector']['end'] - 1, #inclusive end (W3C Anno is exclusive, so -1)
+                end = textrepo_copy['selector']['end'] - 1 #inclusive end (W3C Anno is exclusive, so -1)
                 textrepo_copy['selector'] = {
                     "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
                     "type": "TextAnchorSelector",
