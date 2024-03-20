@@ -4,6 +4,7 @@ import sys
 import json
 import os.path
 import argparse
+import hashlib
 from copy import deepcopy
 
 from textrepo.client import TextRepoClient
@@ -67,6 +68,9 @@ if __name__ == "__main__":
     with open(args.webannotations,'rb') as f:
         for line in f:
             webannotation = json.loads(line)
+
+            #temporary hack because Brocolli/TAV can't deal with slashes in body IDs:
+            webannotation['body']['id'] = hashlib.md5(webannotation['body']['id'].encode('utf-8')).hexdigest()
 
             #copy old target resource to one with new URI in textrepo
             if 'source' in webannotation['target']:
