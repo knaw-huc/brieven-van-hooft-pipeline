@@ -105,7 +105,7 @@ hooft_bron.lst:
 	ls hooft_bron/hoof001hwva0?_01_*.txt > $@
 
 hooft_bron_align.stam.batch: hooft_bron.lst
-	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,1,13)".txt --resource $$1" }' > $@
+	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,12,13)".txt --resource "$$1 }' > $@
 
 hooft_bron_aligned.store.stam.json: hooft_bron.store.stam.json hooft_bron_align.stam.batch
 	@echo "--- Adding source texts ---">&2
