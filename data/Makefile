@@ -67,7 +67,7 @@ hoof001hwva.fromfolia.store.stam.json: $(folia_fixed)
 	mv hoof001hwva.store.stam.json $@
 
 hoof001hwva.align.stam.batch: sourcetexts.noextension.lst
-	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,1,13)".txt --resource $$1" }' > $@
+	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,1,13)".txt --resource "$$1 }' > $@
 
 sourcetexts.lst: $(folia_fixed)
 	ls hoof001hwva0?_01_*.txt > $@
@@ -136,7 +136,7 @@ hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft:metadata" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "meta" --query 'SELECT ANNOTATION ?meta WHERE DATA "brieven-van-hooft-categories" "part"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=\/(hoof001hwva0[234]).txt/id=\1/g' >> $@
 	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft:metadata" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "meta" --query 'SELECT ANNOTATION ?meta WHERE DATASET "brieven-van-hooft-metadata"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=\/(hoof001hwva0[234]).txt/id=\1/g' >> $@
 
-upload: hoof001hwva.jsonl hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
+upload: hoof001hwva.jsonl hoof001hwva.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
 	@echo "--- Upload data into TextRepo & AnnoRepo ---">&2
 ifeq ($(TEXTREPO_URL),)
 		$(error TEXTREPO_URL not set)
@@ -150,7 +150,7 @@ endif
 ifeq ($(ANNOREPO_KEY),)
 		$(error ANNOREPO_KEY not set)
 endif
-	../scripts/uploader.py --verbose --textrepo-url $(TEXTREPO_URL) --textrepo-key $(TEXTREPO_KEY) --annorepo-url $(ANNOREPO_URL) --annorepo-key $(ANNOREPO_KEY) --webannotations $< hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt > hoof001hwva.uploaded.jsonl
+	../scripts/uploader.py --verbose --store hoof001hwva.store.stam.json --textrepo-url $(TEXTREPO_URL) --textrepo-key $(TEXTREPO_KEY) --annorepo-url $(ANNOREPO_URL) --annorepo-key $(ANNOREPO_KEY) --webannotations $< hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt > hoof001hwva.uploaded.jsonl
 
 flushannorepo:
 	@echo "--- Flush remote database for AnnoRepo ---">&2
