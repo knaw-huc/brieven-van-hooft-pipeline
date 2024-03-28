@@ -5,16 +5,23 @@ import json
 import os.path
 import argparse
 import hashlib
+import stam
+
+from datetime import datetime
+from typing import Iterator
 from copy import deepcopy
+from collections import defaultdict
 
 from textrepo.client import TextRepoClient
 from annorepo.client import AnnoRepoClient
 
 PROJECT_ID="brieven-van-hooft"
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog="Uploader", description="Uploads Web Annotations and Texts, as outputted by STAM, to AnnoRepo and TextRepo") 
-    parser.add_argument('textresources', nargs='+', help="Plain text resources", type=str) 
+    parser.add_argument('textresources', nargs='+', help="Plain text resources (Resource IDs to the store)", type=str) 
+    parser.add_argument('--store', help="STAM Annotation Store to load (needed to determine ordered segments)", type=str, required=True)
     parser.add_argument('--textrepo-url', help="URL to the textrepo instance", type=str, action="store", required=True, default="https://brieven-van-hooft.tt.di.huc.knaw.nl/") 
     parser.add_argument('--textrepo-key', help="API key for textrepo", type=str, action="store", required=True) 
     parser.add_argument('--annorepo-url', help="URL to the annorepo instance", type=str, action="store", required=True, default="https://brieven-van-hooft.annorepo.dev.clariah.nl/") 
@@ -23,6 +30,8 @@ if __name__ == "__main__":
     parser.add_argument('--verbose','-v', help="Output updated webannotations to stdout", action="store_true")
 
     args = parser.parse_args()
+
+    store = stam.AnnotationStore(file=args.store)
 
     resource2urimap = {}
 
@@ -36,20 +45,35 @@ if __name__ == "__main__":
     if filetype not in available_type_names:
         trclient.create_file_type(name=filetype, mimetype="application/json")
 
-    for textfile in args.textresources:
-        external_id = os.path.basename(textfile).replace('.txt','')
+    char2segment_begin = defaultdict(dict)
+    char2segment_end = defaultdict(dict)
+    dbnl_date = None
+
+    for resource_id in args.textresources:
+        print(f"Processing {resource_id}...",file=sys.stderr)
+        external_id = resource_id.replace('.txt','')
+        dbnl_date = datetime.fromtimestamp(os.stat(resource_id).st_ctime).isoformat()
+
+        resource = store.resource(resource_id)
+        ordered_segments = resource.segmentation()
 
         #encapsulate the plain text format in the JSON format TextRepo expects  _ordered_segments (with only one huge segment containing the whole edition)
-        with open(textfile,'r',encoding='utf-8') as f:
-            jsonresource = { "_ordered_segments": [ f.read() ] }
+        with open(resource_id,'r',encoding='utf-8') as f:
+            jsonresource = { "_ordered_segments":  [ str(x) for x in ordered_segments ] }
+        for i, segment in enumerate(ordered_segments):
+            char2segment_begin[external_id][segment.begin()] = i
+            char2segment_end[external_id][segment.end() - 1] = i
         contents = json.dumps(jsonresource, ensure_ascii=False)
-        print(f"Uploading {textfile} ({len(contents.encode('utf-8'))} bytes, ID={external_id}) to TextRepo...", file=sys.stderr)
+
+        print(f"Uploading {resource_id} ({len(contents.encode('utf-8'))} bytes, ID={external_id}) to TextRepo...", file=sys.stderr)
         version = trclient.import_version(external_id, type_name=filetype, contents=contents, allow_new_document=True, as_latest_version=True)
         
         #populate the map
         uri = f"{trclient.base_uri}/rest/versions/{version.version_id}"
         resource2urimap[external_id] = uri
         print(f"  Published as {uri}",file=sys.stderr)
+
+    assert dbnl_date is not None
 
     if arclient.has_container(PROJECT_ID):
         print(f"Container already exists, did you intend to delete the existing container and annotations first? (make flush)", file=sys.stderr)
@@ -83,17 +107,23 @@ if __name__ == "__main__":
                 textrepo_copy['source'] = uri
                 textrepo_copy['type'] = "Text"
                 begin = textrepo_copy['selector']['start']
+                startsegment = char2segment_begin[external_id][begin]
                 end = textrepo_copy['selector']['end'] - 1 #inclusive end (W3C Anno is exclusive, so -1)
+                endsegment = char2segment_end[external_id][end]
                 textrepo_copy['selector'] = {
                     "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
                     "type": "TextAnchorSelector",
-                    "start": 0, #segment
-                    "end": 0, #segment inclusive-end
-                    "charStart": begin,
-                    "charEnd": end,                }
+                    "start": startsegment, #segment index
+                    "end": endsegment, #segment inclusive-end
+                }
                 view_uri = uri.replace('/rest/','/view/')
+                #add a timestate to the DBNL source, corresponding to when we fetched it (it might change in the future rendering all offsets invalid)
+                webannotation['target']['state'] = {
+                    "type": "TimeState",
+                    "sourceDate": dbnl_date,
+                }
                 webannotation['target'] = [ webannotation['target'], textrepo_copy, {
-                    "source": f"{view_uri}/segments/index/0/{begin}/0/{end}",
+                    "source": f"{view_uri}/segments/index/{startsegment}/{endsegment}",
                     "type": "Text"
                 }]
             elif 'items' in webannotation['target']: #target may be composite:
@@ -112,14 +142,14 @@ if __name__ == "__main__":
                         item_copy['source'] = uri
                         item_copy['type'] = "Text"
                         begin = item_copy['selector']['start']
+                        startsegment = char2segment_begin[external_id][begin]
                         end = item_copy['selector']['end'] - 1 #inclusive end (W3C Anno is exclusive, so -1)
+                        endsegment = char2segment_end[external_id][end]
                         item_copy['selector'] = {
                             "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
                             "type": "TextAnchorSelector",
-                            "start": 0, #segment
-                            "end": 0, #segment inclusive-end
-                            "charStart": begin,
-                            "charEnd": end,
+                            "start": startsegment, #segment index
+                            "end": endsegment, #segment inclusive-end
                         }
                         textrepo_copy['items'].append(item_copy)
                         view_uri = uri.replace('/rest/','/view/')

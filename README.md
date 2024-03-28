@@ -189,9 +189,9 @@ The web annotations that are uploaded to AnnoRepo look like:
       "pos": "urn:brievenvanhooft:dataset/gustave-pos/"
     }
   ],
-  "id": "urn:brievenvanhooft:annotation/4p4LiD7AwAehuqFMxA9RM-transposed",
+  "id": "urn:brievenvanhooft:annotation/rp4yZApQ2lHuYX98YJT3y-transposed",
   "type": "Annotation",
-  "generated": "2024-03-20T15:44:58.908636560+01:00",
+  "generated": "2024-03-28T10:29:53.093124794+01:00",
   "generator": {
     "id": "https://github.com/annotation/stam-rust",
     "type": "Software",
@@ -199,7 +199,7 @@ The web annotations that are uploaded to AnnoRepo look like:
   },
   "body": {
     "type": "Dataset",
-    "id": "urn:brievenvanhooft:annotation/4p4LiD7AwAehuqFMxA9RM-transposed/body",
+    "id": "3396719bc05f7325cc3e8e7b87f2dcc5",
     "folia:elementtype": "pos",
     "folia:annotationtype": "pos",
     "pos:class": "TW(hoofd)",
@@ -212,24 +212,26 @@ The web annotations that are uploaded to AnnoRepo look like:
       "source": "https://www.dbnl.org/nieuws/text.php?id=hoof001hwva02",
       "selector": {
         "type": "TextPositionSelector",
-        "start": 1627327,
-        "end": 1627330
+        "start": 178357,
+        "end": 178358
+      },
+      "state": {
+        "type": "TimeState",
+        "sourceDate": "2024-03-19T13:42:24.314842"
       }
     },
     {
-      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/47858867-a96a-4d3d-8809-a7f8d33496bb",
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/711a1782-fdb4-4cbb-b130-01d1c0b76d1e",
       "selector": {
         "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
         "type": "TextAnchorSelector",
-        "start": 0,
-        "end": 0,
-        "charStart": 1627327,
-        "charEnd": 1627329
+        "start": 1784,
+        "end": 1784
       },
       "type": "Text"
     },
     {
-      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/47858867-a96a-4d3d-8809-a7f8d33496bb/segments/index/0/1627327/0/1627329",
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/711a1782-fdb4-4cbb-b130-01d1c0b76d1e/segments/index/1784/1784",
       "type": "Text"
     }
   ]
@@ -255,7 +257,7 @@ level:
   "@context": "http://www.w3.org/ns/anno.jsonld",
   "id": "urn:brievenvanhooft:annotation/hoof001hwva03_01_0255",
   "type": "Annotation",
-  "generated": "2024-03-20T15:46:39.658827052+01:00",
+  "generated": "2024-03-28T10:33:43.346706921+01:00",
   "generator": {
     "id": "https://github.com/annotation/stam-rust",
     "type": "Software",
@@ -287,24 +289,26 @@ level:
       "source": "https://www.dbnl.org/nieuws/text.php?id=hoof001hwva03",
       "selector": {
         "type": "TextPositionSelector",
-        "start": 972104,
-        "end": 972120
+        "start": 971927,
+        "end": 973042
+      },
+      "state": {
+        "type": "TimeState",
+        "sourceDate": "2024-03-19T13:42:24.314842"
       }
     },
     {
-      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/322d77d5-2920-437c-a819-d424ce8ec4bf",
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/4bcb047f-a28b-42d3-a91f-04e3716ce236",
       "selector": {
         "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
         "type": "TextAnchorSelector",
-        "start": 0,
-        "end": 0,
-        "charStart": 972104,
-        "charEnd": 972119
+        "start": 84692,
+        "end": 85068
       },
       "type": "Text"
     },
     {
-      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/322d77d5-2920-437c-a819-d424ce8ec4bf/segments/index/0/972104/0/972119",
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/4bcb047f-a28b-42d3-a91f-04e3716ce236/segments/index/84692/85068",
       "type": "Text"
     }
   ]
@@ -326,7 +330,7 @@ This is the tier0 level:
   "@context": "http://www.w3.org/ns/anno.jsonld",
   "id": "urn:brievenvanhooft:annotation/hoof001hwva02",
   "type": "Annotation",
-  "generated": "2024-03-20T15:46:39.653189199+01:00",
+  "generated": "2024-03-28T10:33:43.265217633+01:00",
   "generator": {
     "id": "https://github.com/annotation/stam-rust",
     "type": "Software",
@@ -345,22 +349,24 @@ This is the tier0 level:
         "type": "TextPositionSelector",
         "start": 0,
         "end": 1873371
+      },
+      "state": {
+        "type": "TimeState",
+        "sourceDate": "2024-03-19T13:42:24.314842"
       }
     },
     {
-      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/47858867-a96a-4d3d-8809-a7f8d33496bb",
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/rest/versions/711a1782-fdb4-4cbb-b130-01d1c0b76d1e",
       "selector": {
         "@context": "https://knaw-huc.github.io/ns/huc-di-tt.jsonld",
         "type": "TextAnchorSelector",
         "start": 0,
-        "end": 0,
-        "charStart": 0,
-        "charEnd": 1873370
+        "end": 135375
       },
       "type": "Text"
     },
     {
-      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/47858867-a96a-4d3d-8809-a7f8d33496bb/segments/index/0/0/0/1873370",
+      "source": "https://brieven-van-hooft.tt.di.huc.knaw.nl/textrepo/view/versions/711a1782-fdb4-4cbb-b130-01d1c0b76d1e/segments/index/0/135375",
       "type": "Text"
     }
   ]
