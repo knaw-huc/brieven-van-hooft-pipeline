@@ -174,10 +174,6 @@ ifeq ($(ANNOREPO_KEY),)
 endif
 	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/body.id/hashed"
 	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/body.type/hashed"
-	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.source/ascending"
-	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.selector.type/ascending"
-	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.selector.start/ascending"
-	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.selector.end/ascending"
 
 
 	
