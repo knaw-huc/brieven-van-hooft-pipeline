@@ -1,5 +1,5 @@
 .SHELLFLAGS = -o pipefail -c
-.PHONY: clean list all validation stam folia.html upload flush flushtextrepo flushannorepo webannotations
+.PHONY: clean list all validation stam folia.html upload flush flushtextrepo flushannorepo webannotations indexannorepo
 .DELETE_ON_ERROR:
 
 folia_merged := $(wildcard *.merged.xml)
@@ -164,6 +164,20 @@ endif
 	curl -X DELETE -H 'If-Match: $(shell cat etag)' --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/w3c/brieven-van-hooft/?force=true"
 
 flush: flushannorepo
+
+indexannorepo:
+ifeq ($(ANNOREPO_URL),)
+		$(error ANNOREPO_URL not set)
+endif
+ifeq ($(ANNOREPO_KEY),)
+		$(error ANNOREPO_KEY not set)
+endif
+	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/body.id/hashed"
+	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/body.type/hashed"
+	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.source/ascending"
+	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.selector.type/ascending"
+	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.selector.start/ascending"
+	curl -X PUT --oauth2-bearer $(ANNOREPO_KEY) "$(ANNOREPO_URL)/services/brieven-van-hooft/indexes/target.selector.end/ascending"
 
 
 	
