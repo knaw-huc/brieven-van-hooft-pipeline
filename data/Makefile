@@ -1,5 +1,5 @@
 .SHELLFLAGS = -o pipefail -c
-.PHONY: clean list all validation stam folia.html upload flush flushtextrepo flushannorepo webannotations indexannorepo
+.PHONY: clean list all validation stam folia.html editions.html upload flush flushtextrepo flushannorepo webannotations indexannorepo
 .DELETE_ON_ERROR:
 
 folia_merged := $(wildcard *.merged.xml)
@@ -126,6 +126,8 @@ hooft_bron_transposed.store.stam.json: hooft_bron_aligned.store.stam.json hooft_
 %.edition.html: %.txt hoof001hwva.store.stam.json
 	@echo "--- HTML edition visualisation via STAM ---">&2
 	stam view --query "SELECT RESOURCE ?edition WHERE ID \"$<\";" --query '@VALUETAG SELECT ANNOTATION ?pos WHERE RESOURCE ?edition; DATA "gustave-pos" "class";' --query '@VALUETAG SELECT ANNOTATION ?lemma WHERE RESOURCE ?edition; DATA "gustave-lem" "class";' hoof001hwva.store.stam.json > $@
+
+editions.html: hoof001hwva02.edition.html hoof001hwva03.edition.html hoof001hwva04.edition.html
 
 webannotations: hoof001hwva.jsonl
 
