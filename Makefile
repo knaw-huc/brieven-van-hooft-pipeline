@@ -4,4 +4,4 @@ env: .env
 
 .env:
 	python -m venv .env
-	pip install foliatools stam
+	. .env/bin/activate && pip install folia-tools stam

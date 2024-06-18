@@ -18,14 +18,14 @@ try:
     sourcedir = sys.argv[1]
     assert os.path.isdir(sourcedir)
 except:
-    print("First argument must be source directory (../hooft_bron)")
+    print("First argument must be source directory (../input/hooft_bron)")
     exit(1)
 
 try:
     metadatadir = sys.argv[2]
     assert os.path.isdir(metadatadir)
 except:
-    print("Second argument must be metadata directory (../metadata)")
+    print("Second argument must be metadata directory (../input/metadata)")
     exit(1)
 
 try:

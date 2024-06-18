@@ -40,6 +40,13 @@ FoLiA and making it available as W3C Web Annotations.
 * There is no data that ties the text documents to the original scans.
 * There are various metadata annotations that have been made outside of the FoLiA. For some, it is not yet clear what text they reference and if they can be recovered exactly!
 
+All input data from the 2017 project is published in a separate git repository,
+which is only **privately accessible** due to license constraints (DBNL only
+allowed us to republish the original 17th century text). This repository can be
+found at <https://gitlab.huc.knaw.nl/tt/brieven-van-hooft-data> and is included
+as a git submodule in `data/input`. Contact [Hennie
+Brugman](mailto:hennie.brugman@di.huc.knaw.nl) for access.
+
 ### Questions
 
 *Q: What form of the data do we consider the source of the data that we want to make references to?*
@@ -61,7 +68,7 @@ interesting. In a later project, retraining might also be interesting.
 
 *Q: License for the FoLiA data?*
 
-The annotations are open, the actual text is still uncertain and Hennie & Marjo will contact DBNL.
+The annotations are open, as for the text from DBNL, only the original 17th century texts may be republished. This excludes the editorial footnotes made later.
 
 ## Use case
 
@@ -372,5 +379,4 @@ This is the tier0 level:
   ]
 }
 ```
-
 

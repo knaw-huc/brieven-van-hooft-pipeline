@@ -2,7 +2,7 @@
 .PHONY: clean list all validation stam folia.html editions.html upload flush flushtextrepo flushannorepo webannotations indexannorepo
 .DELETE_ON_ERROR:
 
-folia_merged := $(wildcard *.merged.xml)
+folia_merged := $(wildcard input/*.merged.xml)
 folia_fixed := $(folia_merged:%.merged.xml=%.fixed.xml)
 folia_validation := $(folia_merged:%.merged.xml=%.validation)
 folia_html := $(folia_merged:%.merged.xml=%.folia.html)
@@ -52,18 +52,20 @@ hoof001hwva04.txt:
 stam: hoof001hwva.store.stam.json
 
 folia.html: $(folia_html)
+	mv input/*.html .
 
-%.folia.html: %.fixed.xml
+%.folia.html: input/%.fixed.xml
 	@echo "--- HTML visualisation via FoLiA ---">&2
 	folia2html $< > $@
 
-%.stam.html: %.fixed.xml
+%.stam.html: input/%.fixed.xml
 	@echo "--- HTML visualisation via STAM ---">&2
 	stam view --query "SELECT RESOURCE ?letter WHERE ID \"$*\";" --query '@VALUETAG SELECT ANNOTATION ?pos WHERE RESOURCE ?letter; DATA "gustave-pos" "class";' --query '@VALUETAG SELECT ANNOTATION ?lemma WHERE RESOURCE ?letter; DATA "gustave-lem" "class";' hoof001hwva.store.stam.json > $@
 
 hoof001hwva.fromfolia.store.stam.json: $(folia_fixed)
 	@echo "--- FoLiA to STAM conversion ---">&2
 	folia2stam --id hoof001hwva -X $^
+	#all output will be in current dir, not input/
 	mv hoof001hwva.store.stam.json $@
 
 hoof001hwva.align.stam.batch: sourcetexts.noextension.lst
@@ -95,17 +97,17 @@ hoof001hwva.store.stam.json: hoof001hwva.transposed.store.stam.json hooft_bron_t
 	@echo "--- Merging annotation stores ---">&2
 	stam init --output $@ $^
 	@echo "--- Adding final metadata ---">&2
-	python ../scripts/metadata2stam.py hooft_bron metadata $@   #existing file, will augment
+	python ../scripts/metadata2stam.py input/hooft_bron input/metadata $@   #existing file, will augment
 
 hooft_bron.store.stam.json:
 	-rm $@
-	python ../scripts/metadata2stam.py hooft_bron metadata $@  #non-existing file, will be created
+	python ../scripts/metadata2stam.py input/hooft_bron input/metadata $@  #non-existing file, will be created
 
 hooft_bron.lst:
-	ls hooft_bron/hoof001hwva0?_01_*.txt > $@
+	ls input/hooft_bron/hoof001hwva0?_01_*.txt > $@
 
 hooft_bron_align.stam.batch: hooft_bron.lst
-	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,12,13)".txt --resource "$$1 }' > $@
+	cat $< | awk '{ print "align --trim --verbose --resource "substr($$1,18,13)".txt --resource "$$1 }' > $@
 
 hooft_bron_aligned.store.stam.json: hooft_bron.store.stam.json hooft_bron_align.stam.batch
 	@echo "--- Adding source texts ---">&2
