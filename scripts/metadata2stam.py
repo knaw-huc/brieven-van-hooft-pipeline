@@ -120,7 +120,7 @@ with open(os.path.join(metadatadir,"categories.csv")) as csvfile:
 dbnl_ids = set(categories.keys()) | set(letters_mapped.keys())
 
 for dbnl_id in dbnl_ids:
-    letter_filename = f"hooft_bron/{dbnl_id}.txt"
+    letter_filename = f"input/hooft_bron/{dbnl_id}.txt"
     if mode == Mode.PRE:
         resource = store.resource(letter_filename)
         target = stam.Selector.resourceselector(resource)
