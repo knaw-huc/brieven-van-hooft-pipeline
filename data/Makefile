@@ -125,7 +125,7 @@ hooft_bron_transposed.store.stam.json: hooft_bron_aligned.store.stam.json hooft_
 	@echo "--- Transposing annotations ---">&2
 	cat hooft_bron_transpose.stam.batch | stam batch --output $@ $<
 
-%.edition.html: %.txt hoof001hwva.store.stam.json
+%.edition.html: %.txt
 	@echo "--- HTML edition visualisation via STAM ---">&2
 	stam view --query "SELECT RESOURCE ?edition WHERE ID \"$<\";" --query '@VALUETAG SELECT ANNOTATION ?pos WHERE RESOURCE ?edition; DATA "gustave-pos" "class";' --query '@VALUETAG SELECT ANNOTATION ?lemma WHERE RESOURCE ?edition; DATA "gustave-lem" "class";' hoof001hwva.store.stam.json > $@
 
