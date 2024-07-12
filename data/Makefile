@@ -49,7 +49,7 @@ hoof001hwva03.txt:
 hoof001hwva04.txt:
 	curl https://www.dbnl.org/nieuws/text.php\?id\=hoof001hwva04 > $@
 
-stam: hoof001hwva.store.stam.json
+stam: hoof001hwva.output.store.stam.json
 
 folia.html: $(folia_html)
 	mv input/*.html .
@@ -139,6 +139,10 @@ hoof001hwva.jsonl: hoof001hwva.store.stam.json
 	stam query --format w3anno --ns "folia: https://w3id.org/folia/v2/" --ns "lem: urn:brievenvanhooft:dataset/gustave-lem/" --dataset-prefix "urn:brievenvanhooft:dataset" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "lem" --query 'SELECT ANNOTATION ?lem WHERE DATA "gustave-lem" "class"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=\/(hoof001hwva0[234]).txt/id=\1/g' >> $@
 	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft:metadata" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "meta" --query 'SELECT ANNOTATION ?meta WHERE DATA "brieven-van-hooft-categories" "part"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=\/(hoof001hwva0[234]).txt/id=\1/g' >> $@
 	stam query --format w3anno --dataset-prefix "urn:brievenvanhooft:metadata" --annotation-prefix "urn:brievenvanhooft:annotation" --resource-prefix "https://www.dbnl.org/nieuws/text.php?id=" --use "meta" --query 'SELECT ANNOTATION ?meta WHERE DATASET "brieven-van-hooft-metadata"; [ RESOURCE "hoof001hwva02.txt" OR RESOURCE "hoof001hwva03.txt" OR RESOURCE "hoof001hwva04.txt" ];' hoof001hwva.store.stam.json | sed -r 's/id=\/(hoof001hwva0[234]).txt/id=\1/g' >> $@
+
+hoof001hwva.output.store.stam.json: hoof001hwva.store.stam.json
+	@echo "--- Shrinking model ---">&2
+	stam split --verbose --keep --resource hoof001hwva02.txt --resource hoof001hwva03.txt --resource hoof001hwva04.txt  -o hoof001hwva.output.store.stam.json hoof001hwva.store.stam.json
 
 upload: hoof001hwva.jsonl hoof001hwva.store.stam.json hoof001hwva02.txt hoof001hwva03.txt hoof001hwva04.txt
 	@echo "--- Upload data into TextRepo & AnnoRepo ---">&2
