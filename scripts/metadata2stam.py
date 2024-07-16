@@ -66,8 +66,8 @@ if mode == Mode.POST:
         targetresource_id = targetside.resources()[0].id()
         assert sourceresource_id is not None
         assert targetresource_id is not None
-        if sourceresource_id.startswith("hooft_bron/") and targetresource_id in EDITIONS:
-            dbnl_id = sourceresource_id[len("hooft_bron/"):-4]
+        if sourceresource_id.startswith("input/hooft_bron/") and targetresource_id in EDITIONS:
+            dbnl_id = sourceresource_id[len("input/hooft_bron/"):-4]
 
             begin = letters_mapped[dbnl_id].get(begin)
             end = letters_mapped[dbnl_id].get(end)

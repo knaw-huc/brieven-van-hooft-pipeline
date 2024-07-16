@@ -21,7 +21,7 @@ cleanstam:
 	-rm hoof*.stam.html
 	-rm hoof*.jsonl
 	-rm *.batch
-	-rm *.transpositions.tsv
+	-rm *transpositions.tsv
 	-rm *.edition.html
 
 list: $(folia_merged)
