@@ -53,7 +53,7 @@ with open(os.path.join(metadatadir,"correspondents.csv")) as csvfile:
 letters = {}
 with open(os.path.join(metadatadir,"letters.csv")) as csvfile:
     for row in csv.DictReader(csvfile):
-        letters[row['id']] = row
+        letters[row['dbnl_id']] = row
 
 letters_mapped = defaultdict(dict)
 if mode == Mode.POST:
@@ -148,41 +148,26 @@ for dbnl_id in dbnl_ids:
             "value": dbnl_id
         }
     ]
-    if dbnl_id in categories:
-        row = categories[dbnl_id]
+    if dbnl_id in letters:
         data += [
-            {
-                "set": "brieven-van-hooft-categories",
-                "key": "type",
-                "value": "business" if row['business'] == "1" else "private"
-            },
-            {
-                "set": "brieven-van-hooft-categories",
-                "key": "dependency",
-                "value": "independent" if row['accompanying'] == "0" else "accompanying"
-            },
-             {
-                "set": "brieven-van-hooft-categories",
-                "key": "function",
-                "value": row['function']
-            },
-             {
-                "set": "brieven-van-hooft-categories",
-                "key": "topic",
-                "value": row['topic']
-            },
             {
                 "set": "brieven-van-hooft-metadata",
                 "key": "letter_id",
-                "value": row['id']
+                "value": letters[dbnl_id]['id']
             },
             {
                 "set": "brieven-van-hooft-metadata",
                 "key": "dated",
-                "value": letters[row['id']]['dated']
+                "value": letters[dbnl_id]['dated']
             }
         ]
-        correspondent_id = letters[row['id']]['to_id']
+        if all(x['key'] != 'letter_id' for x in data):
+            data.append({
+                "set": "brieven-van-hooft-metadata",
+                "key": "letter_id",
+                "value": letters[dbnl_id]['id']
+            })
+        correspondent_id = letters[dbnl_id]['to_id']
         if correspondent_id not in correspondents:
             print(f"WARNING: Correspondent ID {correspondent_id} was not defined.. Skipping", file=sys.stderr)
         else:
@@ -256,6 +241,31 @@ for dbnl_id in dbnl_ids:
                         "value": True if correspondents[correspondent_id]['deathyear_unclear'] == "1" else False,
                     }
                 )
+    else:
+        print(f"WARNING: DBNL ID {dbnl_id} was not defined in letters.csv.. No further metadata associated!", file=sys.stderr)
+    if dbnl_id in categories:
+        data += [
+            {
+                "set": "brieven-van-hooft-categories",
+                "key": "type",
+                "value": "business" if categories[dbnl_id]['business'] == "1" else "private"
+            },
+            {
+                "set": "brieven-van-hooft-categories",
+                "key": "dependency",
+                "value": "independent" if categories[dbnl_id]['accompanying'] == "0" else "accompanying"
+            },
+             {
+                "set": "brieven-van-hooft-categories",
+                "key": "function",
+                "value": categories[dbnl_id]['function']
+            },
+             {
+                "set": "brieven-van-hooft-categories",
+                "key": "topic",
+                "value": categories[dbnl_id]['topic']
+            }
+        ]
         
     kwargs = {}
     if mode == Mode.POST:
