@@ -17,7 +17,11 @@ builds upon other infrastructure
 [Broccoli](https://github.com/knaw-huc/broccoli)) at KNAW HuC's Team Text.
 
 This project serves a test-case to use STAM as a pivot model for untangling
-FoLiA and making it available as W3C Web Annotations.
+FoLiA and making it available as W3C Web Annotations. End-users are recommended
+to check out [Brieven van Hooft -
+Notebook](https://github.com/knaw-huc/brieven-van-hooft-notebook) rather than
+this repository, the notebook is a derived project allows to interactively
+visualise and explore the corpus that was built with this pipeline.
 
 ## Data Exploration
 
@@ -379,4 +383,3 @@ This is the tier0 level:
   ]
 }
 ```
-
